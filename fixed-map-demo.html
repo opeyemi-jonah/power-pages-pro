@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Step Form with Bootstrap</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Leaflet CSS for the map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        /* Custom styles to override or add to Bootstrap */
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .error {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: -0.5rem;
+        }
+
+        /* Style for the map container */
+        #map {
+            height: 400px;
+            /* Set a specific height for the map */
+            border-radius: 0.375rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        /* Style for the step tabs */
+        .form-nav-tabs .nav-link {
+            cursor: pointer;
+        }
+
+        .form-nav-tabs .nav-link.disabled {
+            color: #6c757d !important;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Hide the navigation buttons on the final review step */
+        .form-nav.hidden-on-review {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <main class="container py-5">
+        <!-- The jumbotron-style container -->
+        <div class="p-5 mb-4 bg-white rounded-3 shadow">
+            <h1 class="display-5 fw-bold text-center mb-5">Application Form</h1>
+
+            <form id="multiStepForm">
+
+                <!-- Tab Navigation for the Steps -->
+                <ul class="nav nav-tabs form-nav-tabs mb-4" id="formTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="tab-1" data-bs-toggle="tab" href="#step-1" data-step="0"
+                            role="tab" aria-controls="step-1" aria-selected="true">1. Applicant</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" id="tab-2" data-bs-toggle="tab" href="#step-2" data-step="1"
+                            role="tab" aria-controls="step-2" aria-selected="false">2. Project</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" id="tab-3" data-bs-toggle="tab" href="#step-3" data-step="2"
+                            role="tab" aria-controls="step-3" aria-selected="false">3. Schedule</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" id="tab-4" data-bs-toggle="tab" href="#step-4" data-step="3"
+                            role="tab" aria-controls="step-4" aria-selected="false">4. Assurance</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" id="tab-5" data-bs-toggle="tab" href="#step-5" data-step="4"
+                            role="tab" aria-controls="step-5" aria-selected="false">5. Attachment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" id="tab-6" data-bs-toggle="tab" href="#step-6" data-step="5"
+                            role="tab" aria-controls="step-6" aria-selected="false">6. Acknowledge</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" id="tab-7" data-bs-toggle="tab" href="#step-7" data-step="6"
+                            role="tab" aria-controls="step-7" aria-selected="false">7. Review</a>
+                    </li>
+                </ul>
+
+                <!-- Step 1: Applicant Information -->
+                <div class="form-step active" data-step="0">
+                    <h3 class="mb-4">Applicant Information</h3>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label for="new_applicantname" class="form-label">Applicant Name:</label>
+                            <input type="text" class="form-control" id="new_applicantname" required>
+                            <div id="err_applicantname" class="error"></div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="new_applicantemail" class="form-label">Applicant Email:</label>
+                            <input type="email" class="form-control" id="new_applicantemail" required>
+                            <div id="err_applicantemail" class="error"></div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="new_applicantphone" class="form-label">Applicant Phone:</label>
+                            <input type="tel" class="form-control" id="new_applicantphone" required>
+                            <div id="err_applicantphone" class="error"></div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="new_primarycontactname" class="form-label">Primary Contact Name:</label>
+                            <input type="text" class="form-control" id="new_primarycontactname" required>
+                            <div id="err_primarycontactname" class="error"></div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="new_primarycontactemail" class="form-label">Primary Contact Email:</label>
+                            <input type="email" class="form-control" id="new_primarycontactemail" required>
+                            <div id="err_primarycontactemail" class="error"></div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="new_primarycontactphone" class="form-label">Primary Contact Phone:</label>
+                            <input type="tel" class="form-control" id="new_primarycontactphone" required>
+                            <div id="err_primarycontactphone" class="error"></div>
+                        </div>
+                        <div class="col-12">
+                            <label for="new_organizationstructure" class="form-label">Organization Structure:</label>
+                            <textarea class="form-control" id="new_organizationstructure" rows="3"></textarea>
+                            <div id="err_organizationstructure" class="error"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Project Details with Location Picker -->
+                <div class="form-step" data-step="1">
+                    <h3 class="mb-4">Project Details</h3>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label for="new_plantname" class="form-label">Plant Name:</label>
+                            <input type="text" class="form-control" id="new_plantname" required>
+                            <div id="err_plantname" class="error"></div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="new_location" class="form-label">Location:</label>
+                            <input type="text" class="form-control" id="new_location" required>
+                            <div id="err_location" class="error"></div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="new_plantdesign" class="form-label">Plant Design:</label>
+                            <select class="form-select" id="new_plantdesign" required>
+                                <option value="">Select an option</option>
+                                <option value="Option 1">Option 1</option>
+                                <option value="Option 2">Option 2</option>
+                                <option value="Option 3">Option 3</option>
+                            </select>
+                            <div id="err_plantdesign" class="error"></div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="new_latitude" class="form-label">Latitude:</label>
+                            <input type="text" class="form-control" id="new_latitude" readonly>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="new_longitude" class="form-label">Longitude:</label>
+                            <input type="text" class="form-control" id="new_longitude" readonly>
+                        </div>
+                        <!-- New map container -->
+                        <div class="col-12 mt-4">
+                            <div id="map"></div>
+                            <p id="locationMessage" class="mt-2 text-center text-muted">Click on the map to select a
+                                location.</p>
+                        </div>
+                        <div class="col-12">
+                            <label for="new_rectormodel" class="form-label">Rector Model:</label>
+                            <input type="text" class="form-control" id="new_rectormodel">
+                        </div>
+                        <div class="col-12">
+                            <label for="new_operatinghistory" class="form-label">Operating History:</label>
+                            <textarea class="form-control" id="new_operatinghistory" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Schedule & Scope -->
+                <div class="form-step" data-step="2">
+                    <h3 class="mb-4">Schedule & Scope</h3>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label for="new_projectstartdate" class="form-label">Project Start Date:</label>
+                            <input type="date" class="form-control" id="new_projectstartdate" required>
+                            <div id="err_startdate" class="error"></div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="new_projectenddate" class="form-label">Project End Date:</label>
+                            <input type="date" class="form-control" id="new_projectenddate" required>
+                            <div id="err_enddate" class="error"></div>
+                        </div>
+                        <div class="col-12">
+                            <label for="new_modificationdescription" class="form-label">Modification
+                                Description:</label>
+                            <textarea class="form-control" id="new_modificationdescription" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Assurance & Qualifications -->
+                <div class="form-step" data-step="3">
+                    <h3 class="mb-4">Assurance & Qualifications</h3>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label for="new_financialassurance" class="form-label">Financial Assurance:</label>
+                            <select class="form-select" id="new_financialassurance" required>
+                                <option value="">Select an option</option>
+                                <option value="Assured">Assured</option>
+                                <option value="Not Assured">Not Assured</option>
+                            </select>
+                            <div id="err_financialassurance" class="error"></div>
+                        </div>
+                        <div class="col-12">
+                            <label for="new_experiencequalification" class="form-label">Experience
+                                Qualification:</label>
+                            <textarea class="form-control" id="new_experiencequalification" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Attachment -->
+                <div class="form-step" data-step="4">
+                    <h3 class="mb-4">Attachment</h3>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="new_uploadfile" class="form-label">Upload File:</label>
+                            <input type="file" class="form-control" id="new_uploadfile">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 6: Acknowledgement -->
+                <div class="form-step" data-step="5">
+                    <h3 class="mb-4">Acknowledgement</h3>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <p class="form-label mb-2">Terms Accepted:</p>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="terms_yes" name="new_termsaccepted"
+                                    value="Yes" required>
+                                <label class="form-check-label" for="terms_yes">Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="terms_no" name="new_termsaccepted"
+                                    value="No">
+                                <label class="form-check-label" for="terms_no">No</label>
+                            </div>
+                            <div id="err_terms" class="error"></div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="new_initials" class="form-label">Initials:</label>
+                            <input type="text" class="form-control" id="new_initials" required>
+                            <div id="err_initials" class="error"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 7: Review & Confirm -->
+                <div class="form-step" data-step="6">
+                    <h3 class="mb-4">Review & Confirm</h3>
+                    <div class="card p-4">
+                        <h4 class="mb-3">Applicant Information</h4>
+                        <p><strong>Applicant Name:</strong> <span id="confirm_applicantname"></span></p>
+                        <p><strong>Applicant Email:</strong> <span id="confirm_applicantemail"></span></p>
+                        <p><strong>Applicant Phone:</strong> <span id="confirm_applicantphone"></span></p>
+                        <p><strong>Primary Contact Name:</strong> <span id="confirm_primarycontactname"></span></p>
+                        <p><strong>Primary Contact Email:</strong> <span id="confirm_primarycontactemail"></span></p>
+                        <p><strong>Primary Contact Phone:</strong> <span id="confirm_primarycontactphone"></span></p>
+                        <p><strong>Organization Structure:</strong> <span id="confirm_organizationstructure"></span></p>
+
+                        <hr class="my-4">
+
+                        <h4 class="mb-3">Project Details</h4>
+                        <p><strong>Plant Name:</strong> <span id="confirm_plantname"></span></p>
+                        <p><strong>Location:</strong> <span id="confirm_location"></span></p>
+                        <p><strong>Latitude:</strong> <span id="confirm_latitude"></span></p>
+                        <p><strong>Longitude:</strong> <span id="confirm_longitude"></span></p>
+                        <p><strong>Plant Design:</strong> <span id="confirm_plantdesign"></span></p>
+                        <p><strong>Rector Model:</strong> <span id="confirm_rectormodel"></span></p>
+                        <p><strong>Operating History:</strong> <span id="confirm_operatinghistory"></span></p>
+
+                        <hr class="my-4">
+
+                        <h4 class="mb-3">Schedule & Scope</h4>
+                        <p><strong>Project Start Date:</strong> <span id="confirm_projectstartdate"></span></p>
+                        <p><strong>Project End Date:</strong> <span id="confirm_projectenddate"></span></p>
+                        <p><strong>Modification Description:</strong> <span id="confirm_modificationdescription"></span>
+                        </p>
+
+                        <hr class="my-4">
+
+                        <h4 class="mb-3">Assurance & Qualifications</h4>
+                        <p><strong>Financial Assurance:</strong> <span id="confirm_financialassurance"></span></p>
+                        <p><strong>Experience Qualification:</strong> <span id="confirm_experiencequalification"></span>
+                        </p>
+
+                        <hr class="my-4">
+
+                        <h4 class="mb-3">Acknowledgement</h4>
+                        <p><strong>Terms Accepted:</strong> <span id="confirm_termsaccepted"></span></p>
+                        <p><strong>Initials:</strong> <span id="confirm_initials"></span></p>
+
+                        <p class="mt-4">Click submit to finalize.</p>
+                    </div>
+                </div>
+
+                <!-- Form Navigation Buttons -->
+                <div class="form-nav d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="button" class="btn btn-secondary" id="prevBtn">Previous</button>
+                    <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+                    <button type="submit" class="btn btn-success" id="submitBtn" style="display:none;">Submit</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-2007yV1t/v8B9l8R0/5oW2/aT5x/3d4p3gX7w3O7rPjY=" crossorigin=""></script>
+
+    <!-- Custom JavaScript for form functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('multiStepForm');
+            const formSteps = Array.from(document.querySelectorAll('.form-step'));
+            const navTabs = Array.from(document.querySelectorAll('.form-nav-tabs .nav-link'));
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const latInput = document.getElementById('new_latitude');
+            const longInput = document.getElementById('new_longitude');
+            const locationMessage = document.getElementById('locationMessage');
+
+            let currentStep = 0;
+            let map, marker;
+
+            function showStep(stepIndex) {
+                // Hide all steps and deactivate all tabs
+                formSteps.forEach((step, index) => {
+                    step.classList.remove('active');
+                });
+                navTabs.forEach(tab => {
+                    tab.classList.remove('active');
+                    tab.setAttribute('aria-selected', 'false');
+                });
+
+                // Activate the correct step and tab
+                formSteps[stepIndex].classList.add('active');
+                navTabs[stepIndex].classList.add('active');
+                navTabs[stepIndex].setAttribute('aria-selected', 'true');
+
+                // Update button visibility
+                prevBtn.style.display = (stepIndex === 0) ? 'none' : 'inline-block';
+                nextBtn.style.display = (stepIndex === formSteps.length - 1) ? 'none' : 'inline-block';
+                submitBtn.style.display = (stepIndex === formSteps.length - 1) ? 'inline-block' : 'none';
+
+                // Disable tabs for future steps
+                navTabs.forEach((tab, index) => {
+                    if (index > currentStep) {
+                        tab.classList.add('disabled');
+                    } else {
+                        tab.classList.remove('disabled');
+                    }
+                });
+
+                // Initialize the map when the step becomes active
+                if (stepIndex === 1) {
+                    initMap();
+                }
+            }
+
+            function validateStep(stepIndex) {
+                const step = formSteps[stepIndex];
+                const requiredInputs = step.querySelectorAll('[required]');
+                let isValid = true;
+                requiredInputs.forEach(input => {
+                    if (!input.value) {
+                        isValid = false;
+                        const errorDiv = document.getElementById(`err_${input.id.replace('new_', '')}`);
+                        if (errorDiv) {
+                            errorDiv.textContent = 'This field is required.';
+                        }
+                    } else {
+                        const errorDiv = document.getElementById(`err_${input.id.replace('new_', '')}`);
+                        if (errorDiv) {
+                            errorDiv.textContent = '';
+                        }
+                    }
+                });
+                return isValid;
+            }
+
+            function populateReview() {
+                const inputs = form.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    const confirmSpan = document.getElementById(`confirm_${input.id.replace('new_', '')}`);
+                    if (confirmSpan) {
+                        let value;
+                        if (input.type === 'radio') {
+                            if (input.checked) {
+                                value = input.value;
+                            }
+                        } else {
+                            value = input.value;
+                        }
+                        confirmSpan.textContent = value || 'N/A';
+                    }
+                });
+            }
+
+            // Function to initialize the map
+            function initMap() {
+                // Only create the map once
+                if (map) {
+                    setTimeout(() => map.invalidateSize(), 0);
+                    return;
+                }
+
+                // Initialize the map with a default view
+                map = L.map('map').setView([51.505, -0.09], 13);
+
+                // Add the tile layer (OpenStreetMap)
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(map);
+
+                // Add a click event listener to the map
+                map.on('click', function (e) {
+                    const { lat, lng } = e.latlng;
+
+                    // Update the input fields with the new coordinates
+                    latInput.value = lat.toFixed(6);
+                    longInput.value = lng.toFixed(6);
+
+                    // Remove any existing marker
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+
+                    // Add a new marker at the clicked location
+                    marker = L.marker([lat, lng]).addTo(map);
+
+                    locationMessage.textContent = `Location selected at: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                });
+            }
+
+            // Event listener for tab clicks
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const stepIndex = parseInt(e.target.dataset.step);
+                    // Only allow navigation to a previous step
+                    if (stepIndex < currentStep) {
+                        currentStep = stepIndex;
+                        showStep(currentStep);
+                        if (currentStep === formSteps.length - 1) {
+                            populateReview();
+                        }
+                    } else {
+                        e.preventDefault();
+                    }
+                });
+            });
+
+            // Event listener for Previous button
+            prevBtn.addEventListener('click', () => {
+                if (currentStep > 0) {
+                    currentStep--;
+                    showStep(currentStep);
+                }
+            });
+
+            // Event listener for Next button
+            nextBtn.addEventListener('click', () => {
+                if (validateStep(currentStep)) {
+                    currentStep++;
+                    showStep(currentStep);
+                    if (currentStep === formSteps.length - 1) {
+                        populateReview();
+                    }
+                }
+            });
+
+            // Event listener for Cancel button
+            cancelBtn.addEventListener('click', () => {
+                // Clear the form and reload the page
+                form.reset();
+                window.location.reload();
+            });
+
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                if (validateStep(currentStep)) {
+                    // This is where you would handle form submission, e.g., send data to a server
+                    console.log('Form submitted successfully!');
+                    // Use a custom message box or a modal instead of alert()
+                    const message = 'Form submitted successfully! Check the console for data.';
+                    locationMessage.textContent = message;
+                    locationMessage.style.color = '#198754';
+                }
+            });
+
+            // Initial step display
+            showStep(currentStep);
+        });
+    </script>
+
+</body>
+
+</html>
