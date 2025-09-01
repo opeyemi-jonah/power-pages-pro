@@ -448,7 +448,8 @@
                                         </div>
                                         <div class="col-12 col-md-4">
                                             <label for="cre6c_initials" class="form-label">Initials</label>
-                                            <input type="text" class="form-control" id="cre6c_initials" maxlength="4" required>
+                                            <input type="text" class="form-control" id="cre6c_initials" maxlength="4"
+                                                required>
                                             <div id="err_initials" class="error"></div>
                                         </div>
                                     </div>
@@ -715,74 +716,149 @@
             let map = L.map('map').setView([39.381266, -97.922211], 4); // USA center-ish
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
             let marker;
-
             function setMarker(lat, lon) {
                 if (marker) map.removeLayer(marker);
                 marker = L.marker([lat, lon]).addTo(map);
                 map.setView([lat, lon], 13);
             }
 
-            // Reverse geocode helper (for map clicks)
-            async function reverseGeocode(lat, lon) {
-                try {
-                    const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
-                    const data = await resp.json();
-                    if (data && data.display_name) return data.display_name;
-                } catch (e) { console.warn('Reverse geocode failed', e); }
-                return 'Selected Location';
+            // Toggle: true = use Power Automate Flow, false = local (direct Nominatim)
+            const USE_FLOW = false;
+
+            // Flow URL for production
+            const FLOW_GEO_URL = "https://prod-137.westus.logic.azure.com:443/workflows/2c0a2c10de1f40ff8af5584929aa70c7/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0jf2MWWx2DppTvJxqePK_d5Y6HZmZkVagfUhQaFpyk0";
+
+            // Format address to exclude county
+            function formatAddress(addr) {
+                const { house_number, road, city, town, village, state, postcode, country } = addr;
+                return [
+                    [house_number, road].filter(Boolean).join(" "), // e.g. "123 Main St"
+                    city || town || village,
+                    state,
+                    postcode,
+                    country
+                ].filter(Boolean).join(", ");
             }
 
-            map.on('click', async (e) => {
+            // ----- FLOW HELPERS -----
+            async function reverseGeocode(lat, lon) {
+                try {
+                    if (USE_FLOW) {
+                        // Call Power Automate Flow
+                        const resp = await fetch(FLOW_GEO_URL, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ mode: "reverse", lat, lon })
+                        });
+                        const data = await resp.json();
+                        if (data.address) return formatAddress(data.address);
+                        return "Selected Location";
+                    } else {
+                        // Direct Nominatim
+                        const resp = await fetch(
+                            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&addressdetails=1&countrycodes=us`
+                        );
+                        const data = await resp.json();
+                        if (data.address) return formatAddress(data.address);
+                        return "Selected Location";
+                    }
+                } catch (e) {
+                    console.warn("Reverse geocode failed", e);
+                    return "Selected Location";
+                }
+            }
+
+            async function searchLocations(query) {
+                try {
+                    if (USE_FLOW) {
+                        const resp = await fetch(FLOW_GEO_URL, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ mode: "search", query })
+                        });
+                        const results = await resp.json();
+                        return results.map(r => ({
+                            lat: r.lat,
+                            lon: r.lon,
+                            display: r.address ? formatAddress(r.address) : (r.display_name || "")
+                        }));
+                    } else {
+                        const resp = await fetch(
+                            `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}&addressdetails=1&countrycodes=us`
+                        );
+                        const results = await resp.json();
+                        return results.map(r => ({
+                            lat: r.lat,
+                            lon: r.lon,
+                            display: r.address ? formatAddress(r.address) : (r.display_name || "")
+                        }));
+                    }
+                } catch (e) {
+                    console.warn("Search failed", e);
+                    return [];
+                }
+            }
+
+            // ----- MAP CLICK -----
+            map.on("click", async (e) => {
                 const { lat, lng } = e.latlng;
-                $('#cre6c_latitude').value = lat.toFixed(6);
-                $('#cre6c_longitude').value = lng.toFixed(6);
-                const name = await reverseGeocode(lat, lng);
-                $('#cre6c_location').value = name;
-                $('#locationMessage').textContent = `Location set to: ${name}`;
+                $("#cre6c_latitude").value = lat.toFixed(6);
+                $("#cre6c_longitude").value = lng.toFixed(6);
+
+                const formatted = await reverseGeocode(lat, lng);
+                $("#cre6c_location").value = formatted;  // always clean address
+                $("#locationMessage").textContent = `Location set to: ${formatted}`;
                 setMarker(lat, lng);
             });
 
-            // Search with suggestions (Nominatim)
-            const locInput = $('#cre6c_location');
-            const suggBox = $('#locationSuggestions');
+            // ----- SEARCH WITH SUGGESTIONS -----
+            const locInput = $("#cre6c_location");
+            const suggBox = $("#locationSuggestions");
 
             const debounce = (fn, delay = 350) => {
-                let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+                let t;
+                return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
             };
 
-            locInput.addEventListener('input', debounce(async () => {
+            locInput.addEventListener("input", debounce(async () => {
                 const q = locInput.value.trim();
-                if (q.length < 3) { suggBox.classList.add('d-none'); suggBox.innerHTML = ""; return; }
-                try {
-                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`);
-                    const places = await res.json();
-                    if (!places?.length) { suggBox.classList.add('d-none'); suggBox.innerHTML = ""; return; }
-                    suggBox.innerHTML = places.map(p =>
-                        `<div data-lat="${p.lat}" data-lon="${p.lon}" data-display="${p.display_name}">${p.display_name}</div>`
-                    ).join('');
-                    suggBox.classList.remove('d-none');
-                } catch (e) {
-                    suggBox.classList.add('d-none'); suggBox.innerHTML = "";
-                }
+                if (q.length < 3) { suggBox.classList.add("d-none"); suggBox.innerHTML = ""; return; }
+
+                const places = await searchLocations(q);
+                if (!places?.length) { suggBox.classList.add("d-none"); suggBox.innerHTML = ""; return; }
+
+                suggBox.innerHTML = places.map(p =>
+                    `<div data-lat="${p.lat}" data-lon="${p.lon}" data-display="${p.display}">
+            ${p.display}
+        </div>`
+                ).join("");
+                suggBox.classList.remove("d-none");
             }, 400));
 
-            suggBox.addEventListener('click', e => {
-                const item = e.target.closest('div[data-lat]');
+            suggBox.addEventListener("click", e => {
+                const item = e.target.closest("div[data-lat]");
                 if (!item) return;
                 const lat = parseFloat(item.dataset.lat), lon = parseFloat(item.dataset.lon);
-                $('#cre6c_location').value = item.dataset.display;
-                $('#cre6c_latitude').value = lat.toFixed(6);
-                $('#cre6c_longitude').value = lon.toFixed(6);
+
+                $("#cre6c_location").value = item.dataset.display; // always clean address
+                $("#cre6c_latitude").value = lat.toFixed(6);
+                $("#cre6c_longitude").value = lon.toFixed(6);
                 setMarker(lat, lon);
-                suggBox.classList.add('d-none'); suggBox.innerHTML = "";
-                setErr('err_location', '');
+
+                suggBox.classList.add("d-none");
+                suggBox.innerHTML = "";
+                setErr("err_location", "");
             });
 
-            document.addEventListener('click', (e) => {
+            document.addEventListener("click", (e) => {
                 if (!suggBox.contains(e.target) && e.target !== locInput) {
-                    suggBox.classList.add('d-none'); suggBox.innerHTML = "";
+                    suggBox.classList.add("d-none"); suggBox.innerHTML = "";
                 }
             });
+
+            // locInput.addEventListener("blur", () => {
+            //     setTimeout(() => { suggBox.classList.add("d-none"); suggBox.innerHTML = ""; }, 200);
+            // });
 
             /* ---------- Submit to Dataverse ---------- */
             form.addEventListener('submit', function (event) {

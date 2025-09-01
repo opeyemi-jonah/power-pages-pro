@@ -386,6 +386,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        
         /*Initialize Map*/
         var southWest = L.latLng(24.396308, -125.000000); // Approximate SW corner of USA
         var northEast = L.latLng(49.384358, -66.934570); // Approximate NE corner of USA
@@ -606,7 +607,6 @@
         }
 
         /* ---------- Map & Location Search ---------- */
-
         let marker;
         function setMarker(lat, lon) {
             if (marker) map.removeLayer(marker);
@@ -614,19 +614,46 @@
             map.setView([lat, lon], 13);
         }
 
-        // Reverse geocode helper (for map clicks)
+        // Toggle: true = use Power Automate Flow, false = local (direct Nominatim)
+        const USE_FLOW = true;
+
+        // Flow URL for production
         const FLOW_GEO_URL = "https://prod-137.westus.logic.azure.com:443/workflows/2c0a2c10de1f40ff8af5584929aa70c7/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0jf2MWWx2DppTvJxqePK_d5Y6HZmZkVagfUhQaFpyk0";
+
+        // Format address to exclude county
+        function formatAddress(addr) {
+            const { house_number, road, city, town, village, state, postcode, country } = addr;
+            return [
+                [house_number, road].filter(Boolean).join(" "), // e.g. "123 Main St"
+                city || town || village,
+                state,
+                postcode,
+                country
+            ].filter(Boolean).join(", ");
+        }
 
         // ----- FLOW HELPERS -----
         async function reverseGeocode(lat, lon) {
             try {
-                const resp = await fetch(FLOW_GEO_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ mode: "reverse", lat, lon })
-                });
-                const data = await resp.json();
-                return data.display_name || "Selected Location";
+                if (USE_FLOW) {
+                    // Call Power Automate Flow
+                    const resp = await fetch(FLOW_GEO_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ mode: "reverse", lat, lon })
+                    });
+                    const data = await resp.json();
+                    if (data.address) return formatAddress(data.address);
+                    return "Selected Location";
+                } else {
+                    // Direct Nominatim
+                    const resp = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&addressdetails=1&countrycodes=us`
+                    );
+                    const data = await resp.json();
+                    if (data.address) return formatAddress(data.address);
+                    return "Selected Location";
+                }
             } catch (e) {
                 console.warn("Reverse geocode failed", e);
                 return "Selected Location";
@@ -635,12 +662,29 @@
 
         async function searchLocations(query) {
             try {
-                const resp = await fetch(FLOW_GEO_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ mode: "search", query })
-                });
-                return await resp.json();
+                if (USE_FLOW) {
+                    const resp = await fetch(FLOW_GEO_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ mode: "search", query })
+                    });
+                    const results = await resp.json();
+                    return results.map(r => ({
+                        lat: r.lat,
+                        lon: r.lon,
+                        display: r.address ? formatAddress(r.address) : (r.display_name || "")
+                    }));
+                } else {
+                    const resp = await fetch(
+                        `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}&addressdetails=1&countrycodes=us`
+                    );
+                    const results = await resp.json();
+                    return results.map(r => ({
+                        lat: r.lat,
+                        lon: r.lon,
+                        display: r.address ? formatAddress(r.address) : (r.display_name || "")
+                    }));
+                }
             } catch (e) {
                 console.warn("Search failed", e);
                 return [];
@@ -653,9 +697,9 @@
             $("#crc59_latitude").value = lat.toFixed(6);
             $("#crc59_longitude").value = lng.toFixed(6);
 
-            const name = await reverseGeocode(lat, lng);
-            $("#crc59_location").value = name;
-            $("#locationMessage").textContent = `Location set to: ${name}`;
+            const formatted = await reverseGeocode(lat, lng);
+            $("#crc59_location").value = formatted;  // always clean address
+            $("#locationMessage").textContent = `Location set to: ${formatted}`;
             setMarker(lat, lng);
         });
 
@@ -676,8 +720,8 @@
             if (!places?.length) { suggBox.classList.add("d-none"); suggBox.innerHTML = ""; return; }
 
             suggBox.innerHTML = places.map(p =>
-                `<div data-lat="${p.lat}" data-lon="${p.lon}" data-display="${p.display_name}">
-            ${p.display_name}
+                `<div data-lat="${p.lat}" data-lon="${p.lon}" data-display="${p.display}">
+            ${p.display}
         </div>`
             ).join("");
             suggBox.classList.remove("d-none");
@@ -688,7 +732,7 @@
             if (!item) return;
             const lat = parseFloat(item.dataset.lat), lon = parseFloat(item.dataset.lon);
 
-            $("#crc59_location").value = item.dataset.display;
+            $("#crc59_location").value = item.dataset.display; // always clean address
             $("#crc59_latitude").value = lat.toFixed(6);
             $("#crc59_longitude").value = lon.toFixed(6);
             setMarker(lat, lon);
