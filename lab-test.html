@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Environmental Review Form</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+        /* ---------- Error Messages ---------- */
+        .error-message {
+            color: #d9534f;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: block;
+        }
+
+        /* ---------- Navigation Tabs ---------- */
+        .form-nav-tabs .nav-link {
+            cursor: pointer;
+        }
+
+        .form-nav-tabs .nav-link.disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* ---------- Active Step ---------- */
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        /* ---------- Map Container ---------- */
+        #map {
+            height: 400px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
+        }
+
+        /* ---------- Location Suggestions ---------- */
+        #locationSuggestions {
+            position: absolute;
+            z-index: 1000;
+            background: #fff;
+            border: 1px solid #ccc;
+            width: calc(100% - 2px);
+            max-height: 180px;
+            overflow-y: auto;
+            border-radius: 0.25rem;
+            display: none;
+        }
+
+        #locationSuggestions div {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        #locationSuggestions div:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* ---------- Review Table ---------- */
+        .review-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .review-table th,
+        .review-table td {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #dee2e6;
+            text-align: left;
+        }
+
+        .review-table th {
+            background-color: #f8f9fa;
+        }
+
+        /* ---------- Buttons ---------- */
+        button {
+            margin-right: 0.5rem;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* ---------- File Input ---------- */
+        input[type="file"] {
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        /* ---------- Terms & Initials ---------- */
+        #termsContainer {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container mt-4">
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs form-nav-tabs" id="formTabs">
+            <li class="nav-item"><a class="nav-link active" data-step="0">Project Details</a></li>
+            <li class="nav-item"><a class="nav-link disabled" data-step="1">Location</a></li>
+            <li class="nav-item"><a class="nav-link disabled" data-step="2">Upload</a></li>
+            <li class="nav-item"><a class="nav-link disabled" data-step="3">Review</a></li>
+        </ul>
+
+        <!-- Step 1: Project Details -->
+        <div class="form-step active" id="step-0">
+            <h3>Project Details</h3>
+            <div class="form-group">
+                <label for="cre6c_projectname">Project Name</label>
+                <input type="text" id="cre6c_projectname" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="cre6c_startdate">Start Date</label>
+                <input type="date" id="cre6c_startdate" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="cre6c_enddate">End Date</label>
+                <input type="date" id="cre6c_enddate" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="cre6c_plantdesign">Plant Design</label>
+                <select id="cre6c_plantdesign" class="form-control"></select>
+            </div>
+            <div class="form-group">
+                <label for="cre6c_financialassurance">Financial Assurance</label>
+                <select id="cre6c_financialassurance" class="form-control"></select>
+            </div>
+            <button id="nextBtn">Next</button>
+        </div>
+
+        <!-- Step 2: Location -->
+        <div class="form-step" id="step-1">
+            <h3>Location</h3>
+            <div class="form-group position-relative">
+                <label for="locationSearch">Search Location</label>
+                <input type="text" id="locationSearch" class="form-control" placeholder="Search address...">
+                <div id="locationSuggestions"></div>
+            </div>
+            <div id="map"></div>
+            <div class="form-group mt-3">
+                <label for="cre6c_latitude">Latitude</label>
+                <input type="text" id="cre6c_latitude" class="form-control" readonly>
+            </div>
+            <div class="form-group">
+                <label for="cre6c_longitude">Longitude</label>
+                <input type="text" id="cre6c_longitude" class="form-control" readonly>
+            </div>
+            <button id="prevBtn">Previous</button>
+            <button id="nextBtn">Next</button>
+        </div>
+
+        <!-- Step 3: Upload -->
+        <div class="form-step" id="step-2">
+            <h3>Upload Supporting File</h3>
+            <div class="form-group">
+                <input type="file" id="cre6c_fileupload" class="form-control">
+            </div>
+            <button id="prevBtn">Previous</button>
+            <button id="nextBtn">Next</button>
+        </div>
+
+        <!-- Step 4: Review -->
+        <div class="form-step" id="step-3">
+            <h3>Review & Submit</h3>
+            <table class="review-table">
+                <tbody id="reviewTableBody"></tbody>
+            </table>
+            <div id="termsContainer">
+                <input type="checkbox" id="terms" /> <label for="terms">I accept the terms</label><br>
+                <label for="initials">Initials:</label>
+                <input type="text" id="initials" class="form-control" maxlength="3">
+            </div>
+            <button id="prevBtn">Previous</button>
+            <button id="submitBtn">Submit</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // const startDateInput = document.getElementById('cre6c_projectedstartdate');
+            // // document.getElementById('cre6c_projectedenddate').setAttribute('min', startDateInput);
+
+            // startDateInput.addEventListener('change', function () {
+            //     const startDate = this.value;
+            //     const endDateInput = document.getElementById('cre6c_projectedenddate');
+            //     if (startDate) {
+            //         endDateInput.min = startDate;
+            //         if (endDateInput.value && endDateInput.value < startDate) {
+            //             endDateInput.value = startDate; // Reset end date if it's before start date
+            //         }
+            //     } else {
+            //         endDateInput.min = '';
+            //     }
+            });
+
+
+            /* ---------- Helpers ---------- */
+            const $ = sel => document.querySelector(sel);
+            const $$ = sel => Array.from(document.querySelectorAll(sel));
+            const setErr = (id, msg) => { const el = document.getElementById(id); if (el) el.textContent = msg || ""; };
+
+            /* ---------- Step controls ---------- */
+            const form = $('#multiStepForm');
+            const formSteps = $$('.form-step');
+            const navTabs = $$('.form-nav-tabs .nav-link');
+            const prevBtn = $('#prevBtn'), nextBtn = $('#nextBtn'), submitBtn = $('#submitBtn'), cancelBtn = $('#cancelBtn');
+            let currentStep = 0;
+            let completedSteps = new Set();
+
+            function showStep(stepIndex) {
+                formSteps.forEach(s => s.classList.remove('active'));
+                navTabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+
+                formSteps[stepIndex].classList.add('active');
+                navTabs[stepIndex].classList.add('active');
+                navTabs[stepIndex].setAttribute('aria-selected', 'true');
+
+                prevBtn.style.display = (stepIndex === 0) ? 'none' : 'inline-block';
+                nextBtn.style.display = (stepIndex === formSteps.length - 1) ? 'none' : 'inline-block';
+                submitBtn.style.display = (stepIndex === formSteps.length - 1) ? 'inline-block' : 'none';
+
+                navTabs.forEach((tab, idx) => {
+                    if (!completedSteps.has(idx) && idx > currentStep) tab.classList.add('disabled');
+                    else tab.classList.remove('disabled');
+                });
+
+                // Keep map sized correctly on step 2
+                if (stepIndex === 1 && map) {
+                    setTimeout(() => map.invalidateSize(), 0);
+                }
+
+                // Populate review on last step
+                if (stepIndex === formSteps.length - 1) {
+                    populateReview();
+                }
+            }
+
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', e => {
+                    const idx = parseInt(tab.dataset.step);
+                    if (completedSteps.has(idx) || idx < currentStep) {
+                        currentStep = idx; showStep(currentStep);
+                    } else {
+                        e.preventDefault();
+                    }
+                });
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentStep > 0) { currentStep--; showStep(currentStep); }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                // if (validateStep(currentStep)) {
+                completedSteps.add(currentStep);
+                currentStep++;
+                showStep(currentStep);
+                // }
+            });
+
+            // cancelBtn.addEventListener('click', () => {
+            //     form.reset(); window.location.reload();
+            // });
+
+            /* ---------- Validation ---------- */
+            function validateStep(stepIndex) {
+                let valid = true;
+
+                // Basic required & pattern checks
+                const step = formSteps[stepIndex];
+                const requiredInputs = step.querySelectorAll('input[required], select[required], textarea[required]');
+                requiredInputs.forEach(input => {
+                    const baseId = input.id.replace('cre6c_', '');
+                    const errId = `err_${baseId}`;
+                    let msg = "";
+
+                    if (input.type === 'radio') {
+                        // Acknowledgement radios
+                        const group = form.querySelectorAll('input[name="cre6c_termsaccepted"]');
+                        const checked = Array.from(group).some(r => r.checked);
+                        if (!checked) { valid = false; msg = "Please select an option."; }
+                        setErr('err_terms', msg);
+                        return;
+                    }
+
+                    const value = (input.value || "").trim();
+
+                    if (!value) {
+                        valid = false; msg = "This field is required.";
+                    } else if (input.type === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
+                        valid = false; msg = "Enter a valid email address.";
+                    } else if (input.type === 'tel' && !/^[0-9()+\-.\s]{7,20}$/.test(value)) {
+                        valid = false; msg = "Enter a valid phone number.";
+                    }
+
+                    setErr(errId, msg);
+                });
+
+                // Additional rules on Schedule (step 2)
+                if (stepIndex === 2) {
+                    const start = $('#cre6c_projectedstartdate').value;
+                    const end = $('#cre6c_projectedenddate').value;
+                    if (start && end && new Date(end) < new Date(start)) {
+                        valid = false;
+                        setErr('err_enddate', 'End date must be the same or after Start date.');
+                    } else {
+                        setErr('err_enddate', '');
+                    }
+                }
+
+                // On Project step: require lat/long when location provided
+                if (stepIndex === 1) {
+                    const loc = $('#cre6c_location').value.trim();
+                    const lat = $('#cre6c_latitude').value.trim();
+                    const lon = $('#cre6c_longitude').value.trim();
+                    if (loc && (!lat || !lon)) {
+                        valid = false;
+                        setErr('err_location', 'Select a suggestion or click on the map to set coordinates.');
+                    } else {
+                        setErr('err_location', '');
+                    }
+                }
+
+                return valid;
+            }
+
+            // List of table fields to populate in review
+            function populateReview() {
+                const ids = [
+                    'cre6c_applicantname', 'cre6c_applicantemail', 'cre6c_applicantphone',
+                    'cre6c_primarycontactname', 'cre6c_primarycontactemail', 'cre6c_primarycontactphone',
+                    'cre6c_organizationstructure', 'cre6c_plantname', 'cre6c_location', 'cre6c_latitude', 'cre6c_longitude',
+                    'cre6c_plantdesign', 'cre6c_refactormodel', 'cre6c_operatinghistory', 'cre6c_projectedstartdate', 'cre6c_projectedenddate',
+                    'cre6c_modificationdescription', 'cre6c_financialassurance', 'cre6c_experiencequalification', 'cre6c_initials'
+                ];
+                ids.forEach(id => {
+                    const el = document.getElementById(id);
+                    const conf = document.getElementById('confirm_' + id.replace('cre6c_', ''));
+                    if (el && conf) conf.textContent = (el.value || '').toString() || 'N/A';
+                });
+                // termsaccepted (radio)
+                const terms = document.querySelector('input[name="cre6c_termsaccepted"]:checked');
+                const confTerms = document.getElementById('confirm_termsaccepted');
+                if (confTerms) confTerms.textContent = terms ? terms.value : 'N/A';
+            }
+
+            /* ---------- Map & Location Search ---------- */
+            let map = L.map('map').setView([39.381266, -97.922211], 4); // USA center-ish
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+            let marker;
+
+            function setMarker(lat, lon) {
+                if (marker) map.removeLayer(marker);
+                marker = L.marker([lat, lon]).addTo(map);
+                map.setView([lat, lon], 13);
+            }
+
+            // Reverse geocode helper (for map clicks)
+            async function reverseGeocode(lat, lon) {
+                try {
+                    const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+                    const data = await resp.json();
+                    if (data && data.display_name) return data.display_name;
+                } catch (e) { console.warn('Reverse geocode failed', e); }
+                return 'Selected Location';
+            }
+
+            map.on('click', async (e) => {
+                const { lat, lng } = e.latlng;
+                $('#cre6c_latitude').value = lat.toFixed(6);
+                $('#cre6c_longitude').value = lng.toFixed(6);
+                const name = await reverseGeocode(lat, lng);
+                $('#cre6c_location').value = name;
+                $('#locationMessage').textContent = `Location set to: ${name}`;
+                setMarker(lat, lng);
+            });
+
+            // Search with suggestions (Nominatim)
+            const locInput = $('#cre6c_location');
+            const suggBox = $('#locationSuggestions');
+
+            const debounce = (fn, delay = 350) => {
+                let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+            };
+
+            locInput.addEventListener('input', debounce(async () => {
+                const q = locInput.value.trim();
+                if (q.length < 3) { suggBox.classList.add('d-none'); suggBox.innerHTML = ""; return; }
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`);
+                    const places = await res.json();
+                    if (!places?.length) { suggBox.classList.add('d-none'); suggBox.innerHTML = ""; return; }
+                    suggBox.innerHTML = places.map(p =>
+                        `<div data-lat="${p.lat}" data-lon="${p.lon}" data-display="${p.display_name}">${p.display_name}</div>`
+                    ).join('');
+                    suggBox.classList.remove('d-none');
+                } catch (e) {
+                    suggBox.classList.add('d-none'); suggBox.innerHTML = "";
+                }
+            }, 400));
+
+            suggBox.addEventListener('click', e => {
+                const item = e.target.closest('div[data-lat]');
+                if (!item) return;
+                const lat = parseFloat(item.dataset.lat), lon = parseFloat(item.dataset.lon);
+                $('#cre6c_location').value = item.dataset.display;
+                $('#cre6c_latitude').value = lat.toFixed(6);
+                $('#cre6c_longitude').value = lon.toFixed(6);
+                setMarker(lat, lon);
+                suggBox.classList.add('d-none'); suggBox.innerHTML = "";
+                setErr('err_location', '');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!suggBox.contains(e.target) && e.target !== locInput) {
+                    suggBox.classList.add('d-none'); suggBox.innerHTML = "";
+                }
+            });
+
+            /* ---------- Submit to Dataverse ---------- */
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                if (!validateStep(currentStep)) return;
+                const terms_accepted = document.querySelector('input[name="cre6c_termsaccepted"]:checked');
+                const plant_design = parseInt($('#cre6c_plantdesign').value);
+                const financial_assurance = parseInt($('#cre6c_financialassurance').value);
+                var my_file_data;
+                // Get the name of the selected file
+                var fileName = encodeURIComponent(document.getElementById('cre6c_fileupload').files[0].name);
+                // Get the content of the selected file
+                var file = document.getElementById('cre6c_fileupload').files[0];
+
+                // If the user has selected a file
+                if (file) {
+                    // Read the file as a byte array
+                    var reader = new FileReader();
+                    reader.readAsArrayBuffer(file);
+                    // The browser has finished reading the file, we can now do something with it...
+                    reader.onload = function (e) {
+                        // The browser has finished reading the file, we can now do something with it...
+                        var fileContent = new Uint8Array(e.target.result);
+
+                        console.log('File CONTENT--->', fileContent);
+                    };
+                }
+
+                // Collect all values from the form
+                const record = {
+                    cre6c_applicantname: $('#cre6c_applicantname').value.trim(),
+                    cre6c_applicantemail: $('#cre6c_applicantemail').value.trim(),
+                    cre6c_applicantphone: $('#cre6c_applicantphone').value.trim(),
+                    cre6c_primarycontactname: $('#cre6c_primarycontactname').value.trim(),
+                    cre6c_primarycontactemail: $('#cre6c_primarycontactemail').value.trim(),
+                    cre6c_primarycontactphone: $('#cre6c_primarycontactphone').value.trim(),
+                    cre6c_organizationstructure: $('#cre6c_organizationstructure').value.trim(),
+                    cre6c_plantname: $('#cre6c_plantname').value.trim(),
+                    cre6c_location: $('#cre6c_location').value.trim(),
+                    cre6c_latitude: $('#cre6c_latitude').value.trim(),
+                    cre6c_longitude: $('#cre6c_longitude').value.trim(),
+                    cre6c_plantdesign: $('#cre6c_plantdesign').value,
+                    cre6c_refactormodel: document.getElementById('cre6c_refactormodel').value.trim(),
+                    cre6c_operatinghistory: $('#cre6c_operatinghistory').value.trim(),
+                    cre6c_projectedstartdate: $('#cre6c_projectedstartdate').value || null,
+                    cre6c_projectedenddate: $('#cre6c_projectedenddate').value || null,
+                    cre6c_modificationdescription: $('#cre6c_modificationdescription').value.trim(),
+                    cre6c_financialassurance: financial_assurance || null,
+                    cre6c_experiencequalification: $('#cre6c_experiencequalification').value.trim(),
+                    cre6c_termsaccepted: terms_accepted ? (terms_accepted.value === 'Yes') : false,
+                    cre6c_initials: $('#cre6c_initials').value.trim(),
+                    cre6c_fileupload_name: $('#cre6c_fileupload').files[0] ? encodeURIComponent($('#cre6c_fileupload').files[0].name) : null
+                };
+
+                // Disable submit to prevent double posts
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submitting...';
+                console.log("Submitting record:", record);
+
+
+                // Step 1: Create main record
+                // Get the name of the selected file
+                var fileName = encodeURIComponent(document.getElementById('cre6c_fileupload').files[0].name);
+                // Get the content of the selected file
+                var file = document.getElementById('cre6c_fileupload').files[0];
+                // If the user has selected a file
+                if (file) {
+                    // Read the file as a byte array
+                    var reader = new FileReader();
+                    reader.readAsArrayBuffer(file);
+                    // The browser has finished reading the file, we can now do something with it...
+                    reader.onload = function (e) {
+                        // The browser has finished reading the file, we can now do something with it...
+                        var fileContent = e.target.result;
+                        // Run the function to upload to the Portal Web API, passing the GUID of the newly created record and the file's contents and name as inputs
+                        uploadFile(fileContent, fileName, entityID);
+                    };
+                }
+
+                function done(success, message) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit';
+
+                    if (success) {
+                        alert(message || "Record created successfully!");
+                        form.reset();
+                        currentStep = 0;
+                        completedSteps = new Set();
+                        showStep(0);
+                        // Reset map & marker
+                        if (marker) { map.removeLayer(marker); marker = null; }
+                        map.setView([39.381266, -97.922211], 4);
+                    } else {
+                        alert(message || "There was an error completing the request.");
+                    }
+                }
+
+            });
+
+            function getFileContentsAndMetadata(entityID) {
+                // Get the name of the selected file
+                var fileName = encodeURIComponent(document.getElementById('cre6c_fileupload').files[0].name);
+                // Get the content of the selected file
+                var file = document.getElementById('cre6c_fileupload').files[0];
+                // If the user has selected a file
+                if (file) {
+                    // Read the file as a byte array
+                    var reader = new FileReader();
+                    reader.readAsArrayBuffer(file);
+                    // The browser has finished reading the file, we can now do something with it...
+                    reader.onload = function (e) {
+                        // The browser has finished reading the file, we can now do something with it...
+                        var fileContent = e.target.result;
+                        // Run the function to upload to the Portal Web API, passing the GUID of the newly created record and the file's contents and name as inputs
+                        uploadFile(fileContent, fileName, entityID);
+                    };
+                }
+            }
+
+            // Upload the file to
+            function uploadFile(fileContent, fileName, newID) {
+
+                // Use the safeAjax function to call the Portal Web API to upload the file as a note attachment
+                webapi.safeAjax({
+                    type: "PUT", // NOTE: right now Portals requires PUT instead of PATCH for the upload
+                    url: "/_api/cre6c_nrc_permit_devs(" + newID + ")/cre6c_fileupload_name?x-ms-file-name=" + fileName,
+                    contentType: "application/octet-stream",
+                    data: fileContent,
+                    processData: false,
+                    success: function (data, textStatus, xhr) {
+                        done(true, "Record and file created successfully!");
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        // If error occurs uploading the file, provide visual feedback
+                        done(false, "Record created but there was an error uploading the file.");
+                        console.error('Error uploading file:', errorThrown);
+                    }
+                });
+            }
+
+            // Initialize first step view
+            showStep(currentStep);
+
+    </script>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"
+        integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ"
+        crossorigin="anonymous"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"
+        integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

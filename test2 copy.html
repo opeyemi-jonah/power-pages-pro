@@ -1,0 +1,825 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environmental Review Application Form</title>
+
+    <link rel="stylesheet" href="src/EnvironmentalReviewForm.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+
+<body>
+    <div class="bg-light"></div>
+    <div class="row sectionBlockLayout text-start"
+        style="display: flex; flex-wrap: wrap; margin: 0px; min-height: auto; padding: 8px;">
+        <div class="container" style="display: flex; flex-wrap: wrap;">
+            <div class="col-lg-12 columnBlockLayout"
+                style="flex-grow: 1; display: flex; flex-direction: column; min-width: 250px; padding: 16px; margin: 60px 0px;">
+                <main class="form-container">
+                    <div class="p-5 mb-4 bg-white rounded-3 shadow">
+                        <div class="form-header">
+                            <h1><i class="fas fa-leaf"></i> Environmental Review Application</h1>
+                            <p>Complete all required fields to submit your application for environmental review</p>
+                        </div>
+
+                        <form id="multiStepForm" novalidate>
+                            <ul class="nav nav-tabs form-nav-tabs mb-4" id="formTabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="tab-1" data-bs-toggle="tab" href="#step-1"
+                                        data-step="0" role="tab" aria-controls="step-1" aria-selected="true">1.
+                                        Applicant</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link disabled" id="tab-2" data-bs-toggle="tab" href="#step-2"
+                                        data-step="1" role="tab" aria-controls="step-2" aria-selected="false">2.
+                                        Project</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link disabled" id="tab-3" data-bs-toggle="tab" href="#step-3"
+                                        data-step="2" role="tab" aria-controls="step-3" aria-selected="false">3.
+                                        Schedule</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link disabled" id="tab-4" data-bs-toggle="tab" href="#step-4"
+                                        data-step="3" role="tab" aria-controls="step-4" aria-selected="false">4.
+                                        Assurance</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link disabled" id="tab-5" data-bs-toggle="tab" href="#step-5"
+                                        data-step="4" role="tab" aria-controls="step-5" aria-selected="false">5.
+                                        Attachment</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link disabled" id="tab-6" data-bs-toggle="tab" href="#step-6"
+                                        data-step="5" role="tab" aria-controls="step-6" aria-selected="false">6.
+                                        Acknowledge</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link disabled" id="tab-7" data-bs-toggle="tab" href="#step-7"
+                                        data-step="6" role="tab" aria-controls="step-7" aria-selected="false">7.
+                                        Review</a>
+                                </li>
+                            </ul>
+
+                            <div class="form-step active" data-step="0">
+                                <h3 class="mb-4"><i class="fas fa-info-circle"></i>Applicant Information</h3>
+                                <div class="section-content">
+                                    <div class="row g-3 ">
+                                        <div class="col-12 col-md-4">
+                                            <label for="cre6c_applicantname" class="form-label">Applicant Name</label>
+                                            <input type="text" class="form-control" id="cre6c_applicantname" required>
+                                            <div id="err_applicantname" class="error"></div>
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <label for="cre6c_applicantemail" class="form-label">Applicant Email</label>
+                                            <input type="email" class="form-control" id="cre6c_applicantemail" required>
+                                            <div id="err_applicantemail" class="error"></div>
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <label for="cre6c_applicantphone" class="form-label">Applicant Phone</label>
+                                            <input type="tel" class="form-control" id="cre6c_applicantphone" required>
+                                            <div id="err_applicantphone" class="error"></div>
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <label for="cre6c_primarycontactname" class="form-label">Primary Contact
+                                                Name</label>
+                                            <input type="text" class="form-control" id="cre6c_primarycontactname"
+                                                required>
+                                            <div id="err_primarycontactname" class="error"></div>
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <label for="cre6c_primarycontactemail" class="form-label">Primary Contact
+                                                Email</label>
+                                            <input type="email" class="form-control" id="cre6c_primarycontactemail"
+                                                required>
+                                            <div id="err_primarycontactemail" class="error"></div>
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <label for="cre6c_primarycontactphone" class="form-label">Primary Contact
+                                                Phone</label>
+                                            <input type="tel" class="form-control" id="cre6c_primarycontactphone"
+                                                required>
+                                            <div id="err_primarycontactphone" class="error"></div>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="cre6c_organizationstructure" class="form-label">Organization
+                                                Structure</label>
+                                            <textarea class="form-control" id="cre6c_organizationstructure"
+                                                rows="3"></textarea>
+                                            <div id="err_organizationstructure" class="error"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="form-step" data-step="1">
+                                <h3 class="mb-4">Project Details</h3>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-4">
+                                        <label for="cre6c_plantname" class="form-label">Plant Name</label>
+                                        <input type="text" class="form-control" id="cre6c_plantname" required>
+                                        <div id="err_plantname" class="error"></div>
+                                    </div>
+
+                                    <div class="col-12 col-md-4 positioner">
+                                        <label for="cre6c_location" class="form-label">Location (search)</label>
+                                        <input type="text" class="form-control" id="cre6c_location"
+                                            placeholder="Type an address or place" autocomplete="off" required>
+                                        <div id="locationSuggestions" class="suggestions d-none"></div>
+                                        <div id="err_location" class="error"></div>
+                                    </div>
+
+                                    <div class="col-12 col-md-4">
+                                        <label for="cre6c_plantdesign" class="form-label">Plant Design</label>
+                                        <select class="form-select" id="cre6c_plantdesign" required>
+                                            <option value="">Select an option</option>
+                                        </select>
+                                        <div id="err_plantdesign" class="error"></div>
+                                    </div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label for="cre6c_latitude" class="form-label">Latitude</label>
+                                        <input type="text" class="form-control" id="cre6c_latitude" readonly>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label for="cre6c_longitude" class="form-label">Longitude</label>
+                                        <input type="text" class="form-control" id="cre6c_longitude" readonly>
+                                    </div>
+
+                                    <div class="col-12 mt-2">
+                                        <div id="map" aria-label="Location map"></div>
+                                        <p id="locationMessage" class="mt-2 text-center text-muted">Search above or
+                                            click on the
+                                            map
+                                            to select a location.</p>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label for="cre6c_reactormodel" class="form-label">Reactor Model</label>
+                                        <input type="text" class="form-control" id="cre6c_reactormodel">
+                                        <div id="err_reactormodel" class="error"></div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="cre6c_operatinghistory" class="form-label">Operating History</label>
+                                        <textarea class="form-control" id="cre6c_operatinghistory" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-step" data-step="2">
+                                <h3 class="mb-4">Schedule & Scope</h3>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-4">
+                                        <label for="cre6c_projectedstartdate" class="form-label">Project Start
+                                            Date</label>
+                                        <input type="date" class="form-control" id="cre6c_projectedstartdate" required>
+                                        <div id="err_projectedstartdate" class="error"></div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <label for="cre6c_projectedenddate" class="form-label">Project End Date</label>
+                                        <input type="date" class="form-control" id="cre6c_projectedenddate" required>
+                                        <div id="err_projectedenddate" class="error"></div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="cre6c_modificationdescription" class="form-label">Modification
+                                            Description</label>
+                                        <textarea class="form-control" id="cre6c_modificationdescription"
+                                            rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-step" data-step="3">
+                                <h3 class="mb-4">Assurance & Qualifications</h3>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-4">
+                                        <label for="cre6c_financialassurance" class="form-label">Financial
+                                            Assurance</label>
+                                        <select class="form-select" id="cre6c_financialassurance" required>
+                                            <option value="">Select an option</option>
+                                        </select>
+                                        <div id="err_financialassurance" class="error"></div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="cre6c_experiencequalifications" class="form-label">Experience
+                                            Qualification</label>
+                                        <textarea class="form-control" id="cre6c_experiencequalifications"
+                                            rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-step" data-step="4">
+                                <h3 class="mb-4">Attachment</h3>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label for="cre6c_fileupload" class="form-label">Upload File</label>
+                                        <input type="file" class="form-control" id="cre6c_fileupload"
+                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-step" data-step="5">
+                                <h3 class="mb-4">Acknowledgement</h3>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <p class="form-label mb-2">Terms Accepted</p>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" id="terms_yes"
+                                                name="cre6c_termsaccepted" value="Yes" required>
+                                            <label class="form-check-label" for="terms_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" id="terms_no"
+                                                name="cre6c_termsaccepted" value="No">
+                                            <label class="form-check-label" for="terms_no">No</label>
+                                        </div>
+                                        <div id="err_terms" class="error"></div>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <label for="cre6c_initials" class="form-label">Initials</label>
+                                        <input type="text" class="form-control" id="cre6c_initials" required>
+                                        <div id="err_initials" class="error"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-step" data-step="6">
+                                <h3 class="mb-4">Review & Confirm</h3>
+                                <div class="card p-4">
+                                    <h4 class="mb-3">Applicant Information</h4>
+                                    <p><strong>Applicant Name:</strong> <span id="confirm_applicantname"></span></p>
+                                    <p><strong>Applicant Email:</strong> <span id="confirm_applicantemail"></span></p>
+                                    <p><strong>Applicant Phone:</strong> <span id="confirm_applicantphone"></span></p>
+                                    <p><strong>Primary Contact Name:</strong> <span
+                                            id="confirm_primarycontactname"></span></p>
+                                    <p><strong>Primary Contact Email:</strong> <span
+                                            id="confirm_primarycontactemail"></span></p>
+                                    <p><strong>Primary Contact Phone:</strong> <span
+                                            id="confirm_primarycontactphone"></span></p>
+                                    <p><strong>Organization Structure:</strong> <span
+                                            id="confirm_organizationstructure"></span></p>
+
+                                    <hr class="my-4">
+
+                                    <h4 class="mb-3">Project Details</h4>
+                                    <p><strong>Plant Name:</strong> <span id="confirm_plantname"></span></p>
+                                    <p><strong>Location:</strong> <span id="confirm_location"></span></p>
+                                    <p><strong>Latitude:</strong> <span id="confirm_latitude"></span></p>
+                                    <p><strong>Longitude:</strong> <span id="confirm_longitude"></span></p>
+                                    <p><strong>Plant Design:</strong> <span id="confirm_plantdesign"></span></p>
+                                    <p><strong>Reactor Model:</strong> <span id="confirm_reactormodel"></span></p>
+                                    <p><strong>Operating History:</strong> <span id="confirm_operatinghistory"></span>
+                                    </p>
+
+                                    <hr class="my-4">
+
+                                    <h4 class="mb-3">Schedule & Scope</h4>
+                                    <p><strong>Project Start Date:</strong> <span
+                                            id="confirm_projectedstartdate"></span></p>
+                                    <p><strong>Project End Date:</strong> <span id="confirm_projectedenddate"></span></p>
+                                    <p><strong>Modification Description:</strong> <span
+                                            id="confirm_modificationdescription"></span></p>
+
+                                    <hr class="my-4">
+
+                                    <h4 class="mb-3">Assurance & Qualifications</h4>
+                                    <p><strong>Financial Assurance:</strong> <span
+                                            id="confirm_financialassurance"></span></p>
+                                    <p><strong>Experience Qualifications:</strong> <span
+                                            id="confirm_experiencequalifications"></span></p>
+
+                                    <hr class="my-4">
+
+                                    <h4 class="mb-3">Acknowledgement</h4>
+                                    <p><strong>Terms Accepted:</strong> <span id="confirm_termsaccepted"></span></p>
+                                    <p><strong>Initials:</strong> <span id="confirm_initials"></span></p>
+
+                                    <p class="mt-4">Click submit to finalize.</p>
+                                </div>
+                            </div>
+
+                            <div class="form-nav d-flex justify-content-end gap-2 mt-4">
+                                <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                                <button type="button" class="btn btn-secondary" id="prevBtn">Previous</button>
+                                <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+                                <button type="submit" class="btn btn-success" id="submitBtn"
+                                    style="display:none;">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Corrected and updated code below
+            /*Initialize Map*/
+            var southWest = L.latLng(24.396308, -125.000000); // Approximate SW corner of USA
+            var northEast = L.latLng(49.384358, -66.934570); // Approximate NE corner of USA
+            var bounds = L.latLngBounds(southWest, northEast);
+
+            let map = L.map('map', { maxBounds: bounds }).fitBounds(bounds).setView([39.381266, -97.922211], 4); // USA center-ish
+            var myAttrControl = L.control.attribution().addTo(map);
+            myAttrControl.setPrefix('<a href="https://leafletjs.com/">Leaflet</a>');
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19
+            }).addTo(map);
+
+            /* ---------- Helpers ---------- */
+            const $ = sel => document.querySelector(sel);
+            const $$ = sel => Array.from(document.querySelectorAll(sel));
+            const setErr = (id, msg) => { const el = document.getElementById(id); if (el) el.textContent = msg || ""; };
+
+            /**
+             * Formats a date string from YYYY-MM-DD to MM-DD-YYYY.
+             * This function avoids the Date object to prevent timezone issues.
+             * @param {string} dateString The date in YYYY-MM-DD format.
+             * @returns {string} The formatted date in MM-DD-YYYY format or an empty string.
+             */
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                const [year, month, day] = dateString.split('-');
+                return `${month}/${day}/${year}`;
+            }
+
+            /*---------Setup project end date range and display----------*/
+            const startDateInput = document.getElementById('cre6c_projectedstartdate');
+            const endDateInput = document.getElementById('cre6c_projectedenddate');
+
+            // Corrected ID in the initial date attribute setting
+            const today = new Date().toISOString().split('T')[0];
+            startDateInput.setAttribute('min', today);
+
+            function handleDateChange() {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+
+                // Set end date constraints
+                if (startDate) {
+                    endDateInput.min = startDate;
+                    if (endDate && endDate < startDate) {
+                        endDateInput.value = startDate;
+                    }
+                } else {
+                    endDateInput.min = '';
+                }
+            }
+
+            startDateInput.addEventListener('change', handleDateChange);
+            endDateInput.addEventListener('change', handleDateChange);
+
+
+            /* ---------- Step controls ---------- */
+            const form = $('#multiStepForm');
+            const formSteps = $$('.form-step');
+            const navTabs = $$('.form-nav-tabs .nav-link');
+            const prevBtn = $('#prevBtn'), nextBtn = $('#nextBtn'), submitBtn = $('#submitBtn'), cancelBtn = $('#cancelBtn');
+            let currentStep = 0;
+            let completedSteps = new Set();
+
+            function showStep(stepIndex) {
+                formSteps.forEach(s => s.classList.remove('active'));
+                navTabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+
+                formSteps[stepIndex].classList.add('active');
+                navTabs[stepIndex].classList.add('active');
+                navTabs[stepIndex].setAttribute('aria-selected', 'true');
+
+                prevBtn.style.display = (stepIndex === 0) ? 'none' : 'inline-block';
+                nextBtn.style.display = (stepIndex === formSteps.length - 1) ? 'none' : 'inline-block';
+                submitBtn.style.display = (stepIndex === formSteps.length - 1) ? 'inline-block' : 'none';
+
+                navTabs.forEach((tab, idx) => {
+                    if (!completedSteps.has(idx) && idx > currentStep) tab.classList.add('disabled');
+                    else tab.classList.remove('disabled');
+                });
+
+                // Keep map sized correctly on step 2
+                if (stepIndex === 1 && map) {
+                    setTimeout(() => map.invalidateSize(), 0);
+                }
+
+                // Populate review on last step
+                if (stepIndex === formSteps.length - 1) {
+                    populateReview();
+                }
+            }
+
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', e => {
+                    const idx = parseInt(tab.dataset.step);
+                    if (completedSteps.has(idx) || idx < currentStep) {
+                        currentStep = idx; showStep(currentStep);
+                    } else {
+                        e.preventDefault();
+                    }
+                });
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentStep > 0) { currentStep--; showStep(currentStep); }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (validateStep(currentStep)) {
+                    completedSteps.add(currentStep);
+                    currentStep++;
+                    showStep(currentStep);
+                }
+            });
+
+            cancelBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to cancel? All entered data will be lost.')) {
+                    form.reset();
+                    window.location.reload();
+                }
+            });
+
+            /* ---------- Validation ---------- */
+            function validateStep(stepIndex) {
+                let valid = true;
+
+                // Basic required & pattern checks
+                const step = formSteps[stepIndex];
+                const requiredInputs = step.querySelectorAll('input[required], select[required], textarea[required]');
+                requiredInputs.forEach(input => {
+                    const baseId = input.id.replace('cre6c_', '');
+                    const errId = `err_${baseId}`;
+                    let msg = "";
+
+                    if (input.type === 'radio') {
+                        // Acknowledgement radios
+                        const group = form.querySelectorAll('input[name="cre6c_termsaccepted"]');
+                        const checked = Array.from(group).some(r => r.checked);
+                        if (!checked) { valid = false; msg = "Please select an option."; }
+                        setErr('err_terms', msg);
+                        return;
+                    }
+
+                    const value = (input.value || "").trim();
+
+                    if (!value) {
+                        valid = false; msg = "This field is required.";
+                    } else if (input.type === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
+                        valid = false; msg = "Enter a valid email address.";
+                    } else if (input.type === 'tel' && !/^[0-9()+\-.\s]{7,20}$/.test(value)) {
+                        valid = false; msg = "Enter a valid phone number.";
+                    }
+
+                    setErr(errId, msg);
+                });
+
+                // Additional rules on Schedule (step 2)
+                if (stepIndex === 2) {
+                    const start = $('#cre6c_projectedstartdate').value;
+                    const end = $('#cre6c_projectedenddate').value;
+                    if (start && end && new Date(end) < new Date(start)) {
+                        valid = false;
+                        setErr('err_projectedenddate', 'End date must be the same or after Start date.');
+                    } else {
+                        setErr('err_projectedenddate', '');
+                    }
+                }
+
+                // On Project step: require lat/long when location provided
+                if (stepIndex === 1) {
+                    const loc = $('#cre6c_location').value.trim();
+                    const lat = $('#cre6c_latitude').value.trim();
+                    const lon = $('#cre6c_longitude').value.trim();
+                    if (loc && (!lat || !lon)) {
+                        valid = false;
+                        setErr('err_location', 'Select a suggestion or click on the map to set coordinates.');
+                    } else {
+                        setErr('err_location', '');
+                    }
+                }
+
+                return valid;
+            }
+
+            function populateReview() {
+                // Option objects for lookup
+                const plant_design_options = {
+                    "564980000": "Plant Design 1",
+                    "564980001": "Plant Design 2",
+                    "564980002": "Plant Design 3",
+                };
+                const financial_assurance_options = {
+                    "564980000": "Assurance 1",
+                    "564980001": "Assurance 2",
+                    "564980002": "Assurance 3",
+                };
+
+                const ids = [
+                    'cre6c_applicantname', 'cre6c_applicantemail', 'cre6c_applicantphone',
+                    'cre6c_primarycontactname', 'cre6c_primarycontactemail', 'cre6c_primarycontactphone',
+                    'cre6c_organizationstructure', 'cre6c_plantname', 'cre6c_location', 'cre6c_latitude', 'cre6c_longitude',
+                    'cre6c_plantdesign', 'cre6c_reactormodel', 'cre6c_operatinghistory', 'cre6c_projectedstartdate', 'cre6c_projectedenddate',
+                    'cre6c_modificationdescription', 'cre6c_financialassurance', 'cre6c_experiencequalifications', 'cre6c_initials'
+                ];
+                ids.forEach(id => {
+                    const el = document.getElementById(id);
+                    const conf = document.getElementById('confirm_' + id.replace('cre6c_', ''));
+                    if (el && conf) {
+                        // Special handling for dropdowns
+                        if (id === 'cre6c_plantdesign') {
+                            conf.textContent = plant_design_options[el.value] || 'N/A';
+                        } else if (id === 'cre6c_financialassurance') {
+                            conf.textContent = financial_assurance_options[el.value] || 'N/A';
+                        } else if (id === 'cre6c_projectedstartdate' || id === 'cre6c_projectedenddate') {
+                            // Use the new formatDate function here
+                            conf.textContent = formatDate(el.value);
+                        }
+                        else {
+                            conf.textContent = (el.value || '').toString() || 'N/A';
+                        }
+                    }
+                });
+                // termsaccepted (radio)
+                const terms = document.querySelector('input[name="cre6c_termsaccepted"]:checked');
+                const confTerms = document.getElementById('confirm_termsaccepted');
+                if (confTerms) confTerms.textContent = terms ? terms.value : 'N/A';
+            }
+            
+            /* ---------- Map & Location Search ---------- */
+
+            let marker;
+            function setMarker(lat, lon) {
+                if (marker) map.removeLayer(marker);
+                marker = L.marker([lat, lon]).addTo(map);
+                map.setView([lat, lon], 13);
+            }
+
+            // Reverse geocode helper (for map clicks)
+            const FLOW_GEO_URL = "https://prod-137.westus.logic.azure.com:443/workflows/2c0a2c10de1f40ff8af5584929aa70c7/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0jf2MWWx2DppTvJxqePK_d5Y6HZmZkVagfUhQaFpyk0";
+
+            // ----- FLOW HELPERS -----
+            async function reverseGeocode(lat, lon) {
+                try {
+                    const resp = await fetch(FLOW_GEO_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ mode: "reverse", lat, lon })
+                    });
+                    const data = await resp.json();
+                    return data.display_name || "Selected Location";
+                } catch (e) {
+                    console.warn("Reverse geocode failed", e);
+                    return "Selected Location";
+                }
+            }
+
+            async function searchLocations(query) {
+                try {
+                    const resp = await fetch(FLOW_GEO_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ mode: "search", query })
+                    });
+                    return await resp.json();
+                } catch (e) {
+                    console.warn("Search failed", e);
+                    return [];
+                }
+            }
+
+            // ----- MAP CLICK -----
+            map.on("click", async (e) => {
+                const { lat, lng } = e.latlng;
+                $("#cre6c_latitude").value = lat.toFixed(6);
+                $("#cre6c_longitude").value = lng.toFixed(6);
+
+                const name = await reverseGeocode(lat, lng);
+                $("#cre6c_location").value = name;
+                $("#locationMessage").textContent = `Location set to: ${name}`;
+                setMarker(lat, lng);
+            });
+
+            // ----- SEARCH WITH SUGGESTIONS -----
+            const locInput = $("#cre6c_location");
+            const suggBox = $("#locationSuggestions");
+
+            const debounce = (fn, delay = 350) => {
+                let t;
+                return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+            };
+
+            locInput.addEventListener("input", debounce(async () => {
+                const q = locInput.value.trim();
+                if (q.length < 3) { suggBox.classList.add("d-none"); suggBox.innerHTML = ""; return; }
+
+                const places = await searchLocations(q);
+                if (!places?.length) { suggBox.classList.add("d-none"); suggBox.innerHTML = ""; return; }
+
+                suggBox.innerHTML = places.map(p =>
+                    `<div data-lat="${p.lat}" data-lon="${p.lon}" data-display="${p.display_name}">
+                ${p.display_name}
+            </div>`
+                ).join("");
+                suggBox.classList.remove("d-none");
+            }, 400));
+
+            suggBox.addEventListener("click", e => {
+                const item = e.target.closest("div[data-lat]");
+                if (!item) return;
+                const lat = parseFloat(item.dataset.lat), lon = parseFloat(item.dataset.lon);
+
+                $("#cre6c_location").value = item.dataset.display;
+                $("#cre6c_latitude").value = lat.toFixed(6);
+                $("#cre6c_longitude").value = lon.toFixed(6);
+                setMarker(lat, lon);
+
+                suggBox.classList.add("d-none");
+                suggBox.innerHTML = "";
+                setErr("err_location", "");
+            });
+
+            document.addEventListener("click", (e) => {
+                if (!suggBox.contains(e.target) && e.target !== locInput) {
+                    suggBox.classList.add("d-none"); suggBox.innerHTML = "";
+                }
+            });
+
+            /* ---------- Submit to Dataverse ---------- */
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                if (!validateStep(currentStep)) return;
+
+                // Show loading overlay
+                document.getElementById('loadingOverlay').style.display = 'flex';
+
+                const terms_accepted = document.querySelector('input[name="cre6c_termsaccepted"]:checked');
+                const reactor_model = document.getElementById('cre6c_reactormodel').value.trim();
+                const plant_design = parseInt($('#cre6c_plantdesign').value);
+                const financial_assurance = parseInt($('#cre6c_financialassurance').value);
+
+                // Collect all values from the form
+                const record = {
+                    cre6c_applicantname: $('#cre6c_applicantname').value.trim(),
+                    cre6c_applicantemail: $('#cre6c_applicantemail').value.trim(),
+                    cre6c_applicantphone: $('#cre6c_applicantphone').value.trim(),
+                    cre6c_primarycontactname: $('#cre6c_primarycontactname').value.trim(),
+                    cre6c_primarycontactemail: $('#cre6c_primarycontactemail').value.trim(),
+                    cre6c_primarycontactphone: $('#cre6c_primarycontactphone').value.trim(),
+                    cre6c_organizationstructure: $('#cre6c_organizationstructure').value.trim(),
+                    cre6c_plantname: $('#cre6c_plantname').value.trim(),
+                    cre6c_location: $('#cre6c_location').value.trim(),
+                    cre6c_latitude: $('#cre6c_latitude').value.trim(),
+                    cre6c_longitude: $('#cre6c_longitude').value.trim(),
+                    cre6c_plantdesign: plant_design || null,
+                    cre6c_reactormodel: reactor_model,
+                    cre6c_operatinghistory: $('#cre6c_operatinghistory').value.trim(),
+                    cre6c_projectedstartdate: $('#cre6c_projectedstartdate').value || null,
+                    cre6c_projectedenddate: $('#cre6c_projectedenddate').value || null,
+                    cre6c_modificationdescription: $('#cre6c_modificationdescription').value.trim(),
+                    cre6c_financialassurance: financial_assurance || null,
+                    cre6c_experiencequalifications: $('#cre6c_experiencequalifications').value.trim(),
+                    cre6c_termsaccepted: terms_accepted ? (terms_accepted.value === 'Yes') : false,
+                    cre6c_initials: $('#cre6c_initials').value.trim(),
+                    cre6c_fileupload_name: $('#cre6c_fileupload').files[0] ? encodeURIComponent($('#cre6c_fileupload').files[0].name) : null
+                };
+
+                // Disable submit to prevent double posts
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submitting...';
+
+                // Step 1: Create main record
+                webapi.safeAjax({
+                    type: "POST",
+                    url: "/_api/cre6c_nrc_permits_tables", // entity set
+                    contentType: "application/json",
+                    data: JSON.stringify(record),
+                    success: function (data, textStatus, xhr) {
+                        const newId = xhr.getResponseHeader("entityid");
+                        getFileContentsAndMetadata(newId);
+                    },
+                    error: function (xhr) {
+                        console.error("Create error", xhr);
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Submit';
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').style.display = 'none';
+                        alert("There was an error creating the record. Please try again.");
+                    }
+                });
+
+                function getFileContentsAndMetadata(entityID) {
+                    // Get the name of the selected file
+                    var fileName = encodeURIComponent(document.getElementById('cre6c_fileupload').files[0].name);
+                    // Get the content of the selected file
+                    var file = document.getElementById('cre6c_fileupload').files[0];
+                    // If the user has selected a file
+                    if (file) {
+                        // Read the file as a byte array
+                        var reader = new FileReader();
+                        reader.readAsArrayBuffer(file);
+                        // The browser has finished reading the file, we can now do something with it...
+                        reader.onload = function (e) {
+                            // The browser has finished reading the file, we can now do something with it...
+                            var fileContent = new Uint8Array(e.target.result);
+
+                            // Run the function to upload to the Portal Web API, passing the GUID of the newly created record and the file's contents and name as inputs
+                            uploadFile(fileContent, fileName, entityID);
+                        };
+                    }
+                }
+
+                function uploadFile(fileContent, fileName, newID) {
+                    // Use the safeAjax function to call the Portal Web API to upload the file as a note attachment
+                    webapi.safeAjax({
+                        type: "PATCH",
+                        url: "/_api/cre6c_nrc_permits_tables(" + newID + ")/cre6c_fileupload?x-ms-file-name=" + fileName,
+                        contentType: "application/octet-stream",
+                        data: fileContent,
+                        processData: false,
+                        success: function (data, textStatus, xhr) {
+                            done(true, "Record and file created successfully!");
+                        },
+                        error: function (xhr, textStatus, errorThrown) {
+                            // If error occurs uploading the file, provide visual feedback
+                            done(false, "Record created but there was an error uploading the file.");
+                            console.error('Error uploading file:', errorThrown);
+                        }
+                    });
+                }
+
+                function done(success, message) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Application';
+
+                    if (success) {
+                        // Hide loading overlay
+                        document.getElementById('loadingOverlay').style.display = 'none';
+                        // Show modal instead of alert
+                        var allDoneModal = document.getElementById('allDoneModal');
+                        if (allDoneModal) {
+                            var modal = new bootstrap.Modal(allDoneModal);
+                            modal.show();
+                            document.getElementById('homeBtn').onclick = function () {
+                                window.location.href = '/'; // Change to your home page URL if needed
+                            };
+                        }
+                        // Reset form
+                        form.reset();
+                        currentStep = 0;
+                        completedSteps = new Set();
+                        showStep(0);
+                        // Reset map & marker
+                        if (marker) { map.removeLayer(marker); marker = null; }
+                        map.setView([39.381266, -97.922211], 4);
+                    } else {
+                        alert(message || "There was an error completing the request.");
+                    }
+                }
+            });
+
+            // Initialize dropdown options from the corrected script block
+            const plant_design_options = {
+                564980000: "Plant Design 1",
+                564980001: "Plant Design 2",
+                564980002: "Plant Design 3",
+            };
+            const plant_designs_select = document.getElementById("cre6c_plantdesign");
+            Object.entries(plant_design_options).forEach(([value, label]) => {
+                const option = document.createElement("option");
+                option.value = value;
+                option.text = label;
+                plant_designs_select.appendChild(option);
+            });
+
+            const financial_assurance_options = {
+                564980000: "Assurance 1",
+                564980001: "Assurance 2",
+                564980002: "Assurance 3",
+            };
+            const financial_assurance_select = document.getElementById("cre6c_financialassurance");
+            Object.entries(financial_assurance_options).forEach(([value, label]) => {
+                const option = document.createElement("option");
+                option.value = value;
+                option.text = label;
+                financial_assurance_select.appendChild(option);
+            });
+
+
+            // Initialize first step view
+            showStep(currentStep);
+        });
+    </script>
+</body>
+
+</html>

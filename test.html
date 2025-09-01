@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environmental Review Application Form</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="src/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+
+<body>
+
+    <div class="form-container">
+        <div class="form-header">
+            <h1><i class="fas fa-leaf"></i> Environmental Review Application</h1>
+            <p>Complete all required fields to submit your application for environmental review</p>
+        </div>
+
+        <div class="p-4">
+            <!-- Application Info Section -->
+            <div class="form-section active" id="section-0">
+                <h2 class="section-header">
+                    <i class="fas fa-info-circle"></i> Application Info
+                </h2>
+                <div class="section-content">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cre6c_applicantname" class="form-label required-field">Applicant Name</label>
+                            <input type="text" class="form-control" id="cre6c_applicantname" required>
+                            <div id="err_applicantname" class="error"></div>
+
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="cre6c_applicantemail" class="form-label">Applicant Email Address</label>
+                            <input type="email" class="form-control" id="cre6c_applicantemail">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cre6c_applicantphone" class="form-label required-field">Applicant Phone
+                                Number</label>
+                            <input type="tel" class="form-control" id="cre6c_applicantphone" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="cre6c_primarycontactname" class="form-label">Primary Contact Name</label>
+                            <input type="text" class="form-control" id="cre6c_primarycontactname">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cre6c_primarycontactemail" class="form-label">Primary Contact Email
+                                Address</label>
+                            <input type="email" class="form-control" id="cre6c_primarycontactemail">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="cre6c_primarycontactphone" class="form-label">Primary Contact Phone
+                                Number</label>
+                            <input type="tel" class="form-control" id="cre6c_primarycontactphone">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="" class="form-label">Organization Structure</label>
+                        <textarea class="form-control" rows="4" id="cre6c_organizationstructure"
+                            placeholder="Describe your organization structure..."></textarea>
+                    </div>
+                </div>
+                <div class="section-navigation">
+                    <button class="nav-btn btn-prev" onclick="previousSection()" disabled>
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <button class="nav-btn btn-next" onclick="nextSection()">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Project Details Section -->
+            <div class="form-section" id="section-1">
+                <h2 class="section-header">
+                    <i class="fas fa-industry"></i> Project Details
+                </h2>
+                <div class="section-content">
+                    <div class="mb-3">
+                        <label for="cre6c_plantname" class="form-label">Plant Name</label>
+                        <input type="text" class="form-control" id="cre6c_plantname">
+                        <div id="err_plantname" class="error"></div>
+                    </div>
+
+                    <!-- Location search + suggestions -->
+                    <div class="mb-3">
+                        <label class="form-label">Interactive Map</label>
+                        <div class="col-12 mt-2">
+                            <div class="map-container" id="map" aria-label="Location map"></div>
+                            <p id="locationMessage" class="mt-2 text-center text-muted">Search above or click on the map
+                                to select a location.</p>
+                        </div>
+                    </div>
+
+                    <div class="coordinate-display">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="cre6c_location" class="form-label">Location</label>
+                                <input type="text" class="form-control" id="cre6c_location"
+                                    placeholder="Search location or use above pin">
+                                <div id="locationSuggestions" class="suggestions d-none"></div>
+
+                                <div id="err_location" class="error"></div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="cre6c_latitude" class="form-label">Latitude</label>
+                                <input type="number" class="form-control" id="cre6c_latitude" step="0.000001"
+                                    placeholder="Auto-populated" readonly>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="cre6c_longitude" class="form-label">Longitude</label>
+                                <input type="number" class="form-control" id="cre6c_longitude" step="0.000001"
+                                    placeholder="Auto-populated" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cre6c_plantdesign" class="form-label">Plant Design</label>
+                            <select class="form-select" id="cre6c_plantdesign" required>
+                                <option value="">Select an option</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="cre6c_reactormodel" class="form-label">Reactor Model</label>
+                            <input type="text" class="form-control" id="cre6c_reactormodel">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cre6c_operatinghistory" class="form-label">Operating History</label>
+                        <textarea class="form-control" rows="4" id="cre6c_operatinghistory"
+                            placeholder="Describe operating history..."></textarea>
+                    </div>
+                </div>
+                <div class="section-navigation">
+                    <button class="nav-btn btn-prev" onclick="previousSection()">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <button class="nav-btn btn-next" onclick="nextSection()">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Schedule & Scope Section -->
+            <div class="form-section" id="section-2">
+                <h2 class="section-header">
+                    <i class="fas fa-calendar-alt"></i> Schedule & Scope
+                </h2>
+                <div class="section-content">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cre6c_projectedstartdate" class="form-label">Projected Start Date</label>
+                            <input type="date" class="form-control" id="cre6c_projectedstartdate">
+                            <div id="err_startdate" class="error"></div>
+
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="cre6c_projectedenddate" class="form-label">Projected End
+                                Date</label>
+                            <input type="date" class="form-control" id="cre6c_projectedenddate">
+                            <div id="err_cre6c_projectedenddate" class="error"></div>
+
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cre6c_modificationdescription" class="form-label">Modification Description</label>
+                        <textarea class="form-control" rows="4" id="cre6c_modificationdescription"
+                            placeholder="Describe the modifications in detail..."></textarea>
+                    </div>
+                </div>
+                <div class="section-navigation">
+                    <button class="nav-btn btn-prev" onclick="previousSection()">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <button class="nav-btn btn-next" onclick="nextSection()">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Assurance & Qualifications Section -->
+            <div class="form-section" id="section-3">
+                <h2 class="section-header">
+                    <i class="fas fa-shield-alt"></i> Assurance & Qualifications
+                </h2>
+                <div class="section-content">
+                    <div class="mb-3">
+                        <label for="cre6c_financialassurance" class="form-label">Financial Assurance</label>
+                        <select class="form-select" id="cre6c_financialassurance">
+                            <option value="">Select financial assurance type...</option>
+                        </select>
+                        <div id="err_financialassurance" class="error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cre6c_experiencequalifications" class="form-label">Experience and
+                            Qualifications</label>
+                        <textarea class="form-control" rows="4" id="cre6c_experiencequalifications"
+                            placeholder="Describe relevant experience and qualifications..."></textarea>
+                    </div>
+                </div>
+                <div class="section-navigation">
+                    <button class="nav-btn btn-prev" onclick="previousSection()">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <button class="nav-btn btn-next" onclick="nextSection()">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Required Documents Section -->
+            <div class="form-section" id="section-4">
+                <h2 class="section-header">
+                    <i class="fas fa-file-upload"></i> Required Documents
+                </h2>
+                <div class="section-content">
+                    <div class="mb-3">
+                        <label for="cre6c_fileupload" class="form-label">Upload Document</label>
+                        <div class="file-upload-area" onclick="document.getElementById('cre6c_fileupload').click()">
+                            <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-muted"></i>
+                            <h5>Click to Upload or Drag & Drop Files</h5>
+                            <p class="text-muted">Supported formats: PDF, DOC, DOCX, XLS, XLSX</p>
+                            <input type="file" id="cre6c_fileupload" multiple accept=".pdf,.doc,.docx,.xls,.xlsx"
+                                style="display: none;">
+                        </div>
+                        <div id="fileList" class="mt-3"></div>
+                    </div>
+                </div>
+                <div class="section-navigation">
+                    <button class="nav-btn btn-prev" onclick="previousSection()">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <button class="nav-btn btn-next" onclick="nextSection()">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Acknowledgement Section -->
+            <div class="form-section" id="section-5">
+                <h2 class="section-header">
+                    <i class="fas fa-check-circle"></i> Acknowledgement
+                </h2>
+                <div class="section-content">
+                    <div class="acknowledgment-section">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="cre6c_termsaccepted"
+                                id="cre6c_termsaccepted" required>
+                            <label class="form-check-label" for="cre6c_termsaccepted">
+                                I hereby certify that I have read, understand, and agree to the terms and conditions
+                                relating to Environmental Review Application.
+                            </label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cre6c_initials" class="form-label required-field">Initials</label>
+                            <input type="text" class="form-control" id="cre6c_initials" maxlength="5" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-navigation">
+                    <button class="nav-btn btn-prev" onclick="previousSection()">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <button class="nav-btn" onclick="submitForm()"
+                        style="background: #f8f9fa; color: #495057; border: 2px solid #495057;">
+                        <i class="fas fa-paper-plane"></i> Submit Application
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit Section -->
+            <!-- Submit section removed as navigation is now handled in each section -->
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Multi-step form navigation
+        let currentSection = 0;
+        const totalSections = 6;
+        /* ---------- Helpers ---------- */
+        const $ = sel => document.querySelector(sel);
+        const $$ = sel => Array.from(document.querySelectorAll(sel));
+        const setErr = (id, msg) => { const el = document.getElementById(id); if (el) el.textContent = msg || ""; };
+
+        function showSection(sectionIndex) {
+            // Hide all sections
+            for (let i = 0; i < totalSections; i++) {
+                const section = document.getElementById(`section-${i}`);
+                if (section) {
+                    section.classList.remove('active');
+                }
+            }
+
+            // Show current section
+            const activeSection = document.getElementById(`section-${sectionIndex}`);
+            if (activeSection) {
+                activeSection.classList.add('active');
+            }
+
+            // Scroll to top of form
+            document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function nextSection() {
+            if (currentSection < totalSections - 1) {
+                currentSection++;
+                showSection(currentSection);
+            }
+        }
+
+        function previousSection() {
+            if (currentSection > 0) {
+                currentSection--;
+                showSection(currentSection);
+            }
+        }
+
+        /* ---------- Map & Location Search ---------- */
+        let map = L.map('map').setView([39.381266, -97.922211], 4); // USA center-ish
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+        let marker;
+
+        function setMarker(lat, lon) {
+            if (marker) map.removeLayer(marker);
+            marker = L.marker([lat, lon]).addTo(map);
+            map.setView([lat, lon], 13);
+        }
+
+        // Reverse geocode helper (for map clicks)
+        async function reverseGeocode(lat, lon) {
+            try {
+                const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+                const data = await resp.json();
+                if (data && data.display_name) return data.display_name;
+            } catch (e) { console.warn('Reverse geocode failed', e); }
+            return 'Selected Location';
+        }
+
+        map.on('click', async (e) => {
+            const { lat, lng } = e.latlng;
+            $('#cre6c_latitude').value = lat.toFixed(6);
+            $('#cre6c_longitude').value = lng.toFixed(6);
+            const name = await reverseGeocode(lat, lng);
+            $('#cre6c_location').value = name;
+            $('#locationMessage').textContent = `Location set to: ${name}`;
+            setMarker(lat, lng);
+        });
+
+        // Search with suggestions (Nominatim)
+        const locInput = $('#cre6c_location');
+        const suggBox = $('#locationSuggestions');
+
+        const debounce = (fn, delay = 350) => {
+            let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+        };
+
+        locInput.addEventListener('input', debounce(async () => {
+            const q = locInput.value.trim();
+            if (q.length < 3) { suggBox.classList.add('d-none'); suggBox.innerHTML = ""; return; }
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`);
+                const places = await res.json();
+                if (!places?.length) { suggBox.classList.add('d-none'); suggBox.innerHTML = ""; return; }
+                suggBox.innerHTML = places.map(p =>
+                    `<div data-lat="${p.lat}" data-lon="${p.lon}" data-display="${p.display_name}">${p.display_name}</div>`
+                ).join('');
+                suggBox.classList.remove('d-none');
+            } catch (e) {
+                suggBox.classList.add('d-none'); suggBox.innerHTML = "";
+            }
+        }, 400));
+
+        suggBox.addEventListener('click', e => {
+            const item = e.target.closest('div[data-lat]');
+            if (!item) return;
+            const lat = parseFloat(item.dataset.lat), lon = parseFloat(item.dataset.lon);
+            $('#cre6c_location').value = item.dataset.display;
+            $('#cre6c_latitude').value = lat.toFixed(6);
+            $('#cre6c_longitude').value = lon.toFixed(6);
+            setMarker(lat, lon);
+            suggBox.classList.add('d-none'); suggBox.innerHTML = "";
+            setErr('err_location', '');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!suggBox.contains(e.target) && e.target !== locInput) {
+                suggBox.classList.add('d-none'); suggBox.innerHTML = "";
+            }
+        });
+
+        // File Upload Handling
+        const cre6c_fileupload = document.getElementById('cre6c_fileupload');
+        const fileList = document.getElementById('fileList');
+        const fileUploadArea = document.querySelector('.file-upload-area');
+
+        cre6c_fileupload.addEventListener('change', handleFiles);
+
+        // Drag and drop functionality
+        fileUploadArea.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+
+        fileUploadArea.addEventListener('dragleave', function (e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+        });
+
+        fileUploadArea.addEventListener('drop', function (e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            displayFiles(files);
+        });
+
+        function handleFiles(e) {
+            displayFiles(e.target.files);
+        }
+
+        function displayFiles(files) {
+            fileList.innerHTML = '';
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileItem = document.createElement('div');
+                fileItem.className = 'alert alert-info d-flex justify-content-between align-items-center';
+                fileItem.innerHTML = `
+                    <div>
+                        <i class="fas fa-file"></i> ${file.name} (${(file.size / 1024).toFixed(1)} KB)
+                    </div>
+                    <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+                `;
+                fileList.appendChild(fileItem);
+            }
+        }
+
+        // Form Validation and Submission
+        function submitForm() {
+            const terms_accepted = document.querySelector('input[name="cre6c_termsaccepted"]:checked');
+            const plant_design = parseInt($('#cre6c_plantdesign').value);
+            const financial_assurance = parseInt($('#cre6c_financialassurance').value);
+            var my_file_data;
+            // Get the name of the selected file
+            var fileName = encodeURIComponent(document.getElementById('cre6c_fileupload').files[0].name);
+            // Get the content of the selected file
+            var file = document.getElementById('cre6c_fileupload').files[0];
+
+            // If the user has selected a file
+            if (file) {
+                // Read the file as a byte array
+                var reader = new FileReader();
+                reader.readAsArrayBuffer(file);
+                // The browser has finished reading the file, we can now do something with it...
+                reader.onload = function (e) {
+                    // The browser has finished reading the file, we can now do something with it...
+                    var fileContent = new Uint8Array(e.target.result);
+
+                    console.log('File CONTENT--->', fileContent);
+                };
+            }
+
+            // Collect all values from the form
+            const record = {
+                cre6c_applicantname: $('#cre6c_applicantname').value.trim(),
+                cre6c_applicantemail: $('#cre6c_applicantemail').value.trim(),
+                cre6c_applicantphone: $('#cre6c_applicantphone').value.trim(),
+                cre6c_primarycontactname: $('#cre6c_primarycontactname').value.trim(),
+                cre6c_primarycontactemail: $('#cre6c_primarycontactemail').value.trim(),
+                cre6c_primarycontactphone: $('#cre6c_primarycontactphone').value.trim(),
+                cre6c_organizationstructure: $('#cre6c_organizationstructure').value.trim(),
+                cre6c_plantname: $('#cre6c_plantname').value.trim(),
+                cre6c_location: $('#cre6c_location').value.trim(),
+                cre6c_latitude: $('#cre6c_latitude').value.trim(),
+                cre6c_longitude: $('#cre6c_longitude').value.trim(),
+                cre6c_plantdesign: $('#cre6c_plantdesign').value,
+                cre6c_refactormodel: document.getElementById('cre6c_refactormodel').value.trim(),
+                cre6c_operatinghistory: $('#cre6c_operatinghistory').value.trim(),
+                cre6c_projectstartdate: $('#cre6c_projectstartdate').value || null,
+                cre6c_projectenddate: $('#cre6c_projectenddate').value || null,
+                cre6c_modificationdescription: $('#cre6c_modificationdescription').value.trim(),
+                cre6c_financialassurance: financial_assurance || null,
+                cre6c_experiencequalification: $('#cre6c_experiencequalification').value.trim(),
+                cre6c_termsaccepted: terms_accepted ? (terms_accepted.value === 'Yes') : false,
+                cre6c_initials: $('#cre6c_initials').value.trim(),
+                cre6c_fileupload_name: $('#cre6c_fileupload').files[0] ? encodeURIComponent($('#cre6c_fileupload').files[0].name) : null
+            };
+
+            // Disable submit to prevent double posts
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            console.log("Submitting record:", record);
+
+
+            // Step 1: Create main record
+            // Get the name of the selected file
+            
+            // Get the content of the selected file
+            var file = document.getElementById('cre6c_fileupload').files[0];
+            // If the user has selected a file
+            if (file) {
+                // Read the file as a byte array
+                var reader = new FileReader();var fileName = encodeURIComponent(document.getElementById('cre6c_fileupload').files[0].name);
+                reader.readAsArrayBuffer(file);
+                // The browser has finished reading the file, we can now do something with it...
+                reader.onload = function (e) {
+                    // The browser has finished reading the file, we can now do something with it...
+                    var fileContent = e.target.result;
+                    // Run the function to upload to the Portal Web API, passing the GUID of the newly created record and the file's contents and name as inputs
+                    uploadFile(fileContent, fileName, entityID);
+                };
+            }
+
+            function done(success, message) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit';
+
+                if (success) {
+                    alert(message || "Record created successfully!");
+                    form.reset();
+                    currentStep = 0;
+                    completedSteps = new Set();
+                    showStep(0);
+                    // Reset map & marker
+                    if (marker) { map.removeLayer(marker); marker = null; }
+                    map.setView([39.381266, -97.922211], 4);
+                } else {
+                    alert(message || "There was an error completing the request.");
+                }
+            }
+
+            function getFileContentsAndMetadata(entityID) {
+                // Get the name of the selected file
+                var fileName = encodeURIComponent(document.getElementById('cre6c_fileupload').files[0].name);
+                // Get the content of the selected file
+                var file = document.getElementById('cre6c_fileupload').files[0];
+                // If the user has selected a file
+                if (file) {
+                    // Read the file as a byte array
+                    var reader = new FileReader();
+                    reader.readAsArrayBuffer(file);
+                    // The browser has finished reading the file, we can now do something with it...
+                    reader.onload = function (e) {
+                        // The browser has finished reading the file, we can now do something with it...
+                        var fileContent = e.target.result;
+                        // Run the function to upload to the Portal Web API, passing the GUID of the newly created record and the file's contents and name as inputs
+                        uploadFile(fileContent, fileName, entityID);
+                    };
+                }
+            }
+
+            // Upload the file to
+            function uploadFile(fileContent, fileName, newID) {
+
+                // Use the safeAjax function to call the Portal Web API to upload the file as a note attachment
+                webapi.safeAjax({
+                    type: "PUT", // NOTE: right now Portals requires PUT instead of PATCH for the upload
+                    url: "/_api/cre6c_nrc_permit_devs(" + newID + ")/cre6c_fileupload_name?x-ms-file-name=" + fileName,
+                    contentType: "application/octet-stream",
+                    data: fileContent,
+                    processData: false,
+                    success: function (data, textStatus, xhr) {
+                        done(true, "Record and file created successfully!");
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        // If error occurs uploading the file, provide visual feedback
+                        done(false, "Record created but there was an error uploading the file.");
+                        console.error('Error uploading file:', errorThrown);
+                    }
+                });
+            }
+
+        }
+
+
+
+        // Date validation (end date should be after start date)
+        const today = new Date().toISOString().split('T')[0];
+        const tomorrow = new Date(Date.now() + 864e5).toISOString().split('T')[0];
+
+        document.getElementById("cre6c_projectedstartdate").setAttribute('min', today);
+        document.getElementById("cre6c_projectedenddate").setAttribute('min', tomorrow);
+
+        /*---------Setup project end date range----------*/
+        const startDateInput = document.getElementById('cre6c_projectedstartdate');
+
+        startDateInput.addEventListener('change', function () {
+            const startDate = this.value;
+            const endDateInput = document.getElementById('cre6c_projectedenddate');
+            if (startDate) {
+                endDateInput.min = startDate;
+                if (endDateInput.value && endDateInput.value < startDate) {
+                    endDateInput.value = startDate; // Reset end date if it's before start date
+                }
+            } else {
+                endDateInput.min = '';
+            }
+        });
+        // Plant Design (single-select)
+        const plant_design_options = {
+            564980000: "Light-Water Reactor (LWR)",
+            564980001: "Pressurized Water Reactor (PWR)",
+            564980002: "Boiling Water Reactor (BWR)",
+        };
+        const plant_designs_select = document.getElementById("cre6c_plantdesign");
+        Object.entries(plant_design_options).forEach(([value, label]) => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.text = label;
+            plant_designs_select.appendChild(option);
+        });
+
+        // Financial Assurance (single-select)
+        const financial_assurance_options = {
+            564980000: "Self-Assurance",
+            564980001: "Third-Party Assurance",
+        };
+        const financial_assurance_select = document.getElementById("cre6c_financialassurance");
+        Object.entries(financial_assurance_options).forEach(([value, label]) => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.text = label;
+            financial_assurance_select.appendChild(option);
+        });
+
+    </script>
+
+
+</body>
+
+</html>

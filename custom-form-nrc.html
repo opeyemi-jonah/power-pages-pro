@@ -1,0 +1,845 @@
+{% include 'portalwebapihelper' %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        const today = new Date().toISOString().split('T')[0];
+        const tomorrow = new Date(Date.now() + 864e5).toISOString().split('T')[0];
+
+        document.getElementById("crc59_projectedstartdate").setAttribute('min', today);
+        document.getElementById("crc59_projectedenddate").setAttribute('min', tomorrow);
+
+        // Plant Design (single-select)
+        const plant_design_options = {
+            564980000: "Light-Water Reactor (LWR)",
+            564980001: "Pressurized Water Reactor (PWR)",
+            564980002: "Boiling Water Reactor (BWR)",
+        };
+        const plant_designs_select = document.getElementById("crc59_plantdesign");
+        Object.entries(plant_design_options).forEach(([value, label]) => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.text = label;
+            plant_designs_select.appendChild(option);
+        });
+
+        // Financial Assurance (single-select)
+        const financial_assurance_options = {
+            564980000: "Self-Assurance",
+            564980001: "Third-Party Assurance",
+        };
+        const financial_assurance_select = document.getElementById("crc59_financialassurance");
+        Object.entries(financial_assurance_options).forEach(([value, label]) => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.text = label;
+            financial_assurance_select.appendChild(option);
+        });
+    });
+</script>
+
+<div class="container my-4">
+    <!-- All Done Modal -->
+    <div class="modal fade" id="allDoneModal" tabindex="-1" aria-labelledby="allDoneModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title w-100 text-center" id="allDoneModalLabel">All done!</h5>
+                </div>
+                <div class="modal-body text-center">
+                    <p class="fs-5">Your submission was successful.</p>
+                    <button type="button" class="btn btn-primary text-light" id="homeBtn">Home</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Loading Screen Overlay -->
+    <div id="loadingOverlay">
+        <div style="text-align:center;">
+            <div class="spinner-border text-primary" role="status" style="width:3rem; height:3rem;"></div>
+            <div class="mt-3 fs-4 text-dark">Submitting, please wait...</div>
+        </div>
+    </div>
+
+    <main class="">
+        <div class="mb-4 bg-white">
+            <div class="form-header">
+                <h1 class="text-white"><i class="fas fa-leaf"></i> Environmental Review Application</h1>
+                <p class="text-white">Complete all required fields to submit your application for environmental review
+                </p>
+            </div>
+
+            <form id="multiStepForm" class="p-4" novalidate>
+                <!-- Tab Navigation for the Steps -->
+                <ul class="nav nav-tabs form-nav-tabs mb-4" id="formTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link fs-6 active" id="tab-1" data-bs-toggle="tab" href="#step-1" data-step="0"
+                            role="tab" aria-controls="step-1" aria-selected="true">1. Applicant</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-6 disabled" id="tab-2" data-bs-toggle="tab" href="#step-2" data-step="1"
+                            role="tab" aria-controls="step-2" aria-selected="false">2. Project</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-6 disabled" id="tab-3" data-bs-toggle="tab" href="#step-3" data-step="2"
+                            role="tab" aria-controls="step-3" aria-selected="false">3. Schedule</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-6 disabled" id="tab-4" data-bs-toggle="tab" href="#step-4" data-step="3"
+                            role="tab" aria-controls="step-4" aria-selected="false">4. Assurance</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-6 disabled" id="tab-5" data-bs-toggle="tab" href="#step-5" data-step="4"
+                            role="tab" aria-controls="step-5" aria-selected="false">5. Attachment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-6 disabled" id="tab-6" data-bs-toggle="tab" href="#step-6" data-step="5"
+                            role="tab" aria-controls="step-6" aria-selected="false">6. Acknowledge</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-6 disabled" id="tab-7" data-bs-toggle="tab" href="#step-7" data-step="6"
+                            role="tab" aria-controls="step-7" aria-selected="false">7. Review</a>
+                    </li>
+                </ul>
+
+                <!-- Step 1: Applicant Information -->
+                <div class="form-step form-section active" data-step="0">
+                    <h2 class="section-header"><i class="fas fa-info-circle"></i> Applicant Information</h2>
+                    <div class="section-content">
+                        <div class="row g-3 my-2 px-4">
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <label for="crc59_applicantname" class="form-label required-field">Applicant
+                                    Name</label>
+                                <input type="text" class="form-control" id="crc59_applicantname" required>
+                                <div id="err_applicantname" class="error"></div>
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <label for="crc59_applicantemail" class="form-label">Applicant Email</label>
+                                <input type="email" class="form-control" id="crc59_applicantemail">
+                                <div id="err_applicantemail" class="error"></div>
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <label for="crc59_applicantphone" class="form-label required-field">Applicant
+                                    Phone</label>
+                                <input type="tel" class="form-control" id="crc59_applicantphone" required>
+                                <div id="err_applicantphone" class="error"></div>
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <label for="crc59_primarycontactname" class="form-label">Primary Contact Name</label>
+                                <input type="text" class="form-control" id="crc59_primarycontactname">
+                                <div id="err_primarycontactname" class="error"></div>
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <label for="crc59_primarycontactemail" class="form-label">Primary Contact Email</label>
+                                <input type="email" class="form-control" id="crc59_primarycontactemail">
+                                <div id="err_primarycontactemail" class="error"></div>
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <label for="crc59_primarycontactphone" class="form-label">Primary Contact Phone</label>
+                                <input type="tel" class="form-control" id="crc59_primarycontactphone">
+                                <div id="err_primarycontactphone" class="error"></div>
+                            </div>
+                            <div class="col-12">
+                                <label for="crc59_organizationstructure" class="form-label">Organization
+                                    Structure</label>
+                                <textarea class="form-control" id="crc59_organizationstructure" rows="3"></textarea>
+                                <div id="err_organizationstructure" class="error"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Step 2: Project Details with Location Picker -->
+                <div class="form-step form-section" data-step="1">
+                    <h2 class="section-header">
+                        <i class="fas fa-industry"></i> Project Details
+                    </h2>
+                    <div class="section-content">
+                        <div class="row g-3 my-2 px-4">
+                            <div class="col-12 col-md-4">
+                                <label for="crc59_plantname" class="form-label">Plant Name</label>
+                                <input type="text" class="form-control" id="crc59_plantname">
+                                <div id="err_plantname" class="error"></div>
+                            </div>
+
+                            <!-- Location search + suggestions -->
+                            <div class="col-12 col-md-4 positioner">
+                                <label for="crc59_location" class="form-label">Location (search)</label>
+                                <input type="text" class="form-control" id="crc59_location"
+                                    placeholder="Type an address or place" autocomplete="off">
+                                <div id="locationSuggestions" class="suggestions d-none"></div>
+                                <div id="err_location" class="error"></div>
+                            </div>
+
+                            <div class="col-12 col-md-4">
+                                <label for="crc59_plantdesign" class="form-label">Plant Design</label>
+                                <select class="form-select" id="crc59_plantdesign">
+                                    <option value="">Select an option</option>
+                                </select>
+                                <div id="err_plantdesign" class="error"></div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="crc59_latitude" class="form-label">Latitude</label>
+                                <input type="text" class="form-control" id="crc59_latitude" readonly>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="crc59_longitude" class="form-label">Longitude</label>
+                                <input type="text" class="form-control" id="crc59_longitude" readonly>
+                            </div>
+
+                            <div class="col-12 mt-2">
+                                <div id="map" aria-label="Location map"></div>
+                                <p id="locationMessage" class="mt-2 text-center text-muted">Search above or click on the
+                                    map
+                                    to select a location.</p>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="crc59_reactormodel" class="form-label">Reactor Model</label>
+                                <input type="text" class="form-control" id="crc59_reactormodel">
+                            </div>
+                            <div class="col-12">
+                                <label for="crc59_operatinghistory" class="form-label">Operating History</label>
+                                <textarea class="form-control" id="crc59_operatinghistory" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Step 3: Schedule & Scope -->
+                <div class="form-step form-section" data-step="2">
+                    <h2 class="section-header">
+                        <i class="fas fa-calendar-alt"></i> Schedule & Scope
+                    </h2>
+                    <div class="section-content">
+                        <div class="row g-3 my-2 px-4">
+                            <div class="col-12 col-md-4">
+                                <label for="crc59_projectedstartdate" class="form-label">Project Start Date</label>
+                                <input type="date" class="form-control" id="crc59_projectedstartdate">
+                                <div id="err_startdate" class="error"></div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label for="crc59_projectedenddate" class="form-label">Project End Date</label>
+                                <input type="date" class="form-control" id="crc59_projectedenddate">
+                                <div id="err_enddate" class="error"></div>
+                            </div>
+                            <div class="col-12">
+                                <label for="crc59_modificationdescription" class="form-label">Modification
+                                    Description</label>
+                                <textarea class="form-control" id="crc59_modificationdescription" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Step 4: Assurance & Qualifications -->
+                <div class="form-step form-section" data-step="3">
+                    <h2 class="section-header">
+                        <i class="fas fa-shield-alt"></i> Assurance & Qualifications
+                    </h2>
+                    <div class="section-content">
+                        <div class="row g-3 my-2 px-4">
+                            <div class="col-12 col-md-4">
+                                <label for="crc59_financialassurance" class="form-label">Financial Assurance</label>
+                                <select class="form-select" id="crc59_financialassurance">
+                                    <option value="">Select an option</option>
+                                </select>
+                                <div id="err_financialassurance" class="error"></div>
+                            </div>
+                            <div class="col-12">
+                                <label for="crc59_experiencequalifications" class="form-label">Experience
+                                    Qualification</label>
+                                <textarea class="form-control" id="crc59_experiencequalifications" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Step 5: Attachment -->
+                <div class="form-step form-section" data-step="4">
+                    <h2 class="section-header">
+                        <i class="fas fa-file-upload"></i> Required Documents
+                    </h2>
+                    <div class="section-content">
+                        <div class="row g-3 my-2 px-4">
+                            <div class="col-12">
+                                <label for="crc59_fileupload" class="form-label">Upload File</label>
+                                <input type="file" class="form-control" id="crc59_fileupload"
+                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                <div id="err_fileupload" class="error"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Step 6: Acknowledgement -->
+                <div class="form-step form-section" data-step="5">
+                    <h2 class="section-header">
+                        <i class="fas fa-check-circle"></i> Acknowledgement
+                    </h2>
+                    <div class="section-content">
+                        <div class="row g-3 my-2 px-4">
+                            <div class="col-12">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" id="terms_yes"
+                                        name="crc59_termsaccepted" value="Yes" required>
+                                    <label class="form-check-label required-field" for="terms_yes">
+                                        I hereby certify that I have read, understand, and agree to the terms and
+                                        conditions relating to Environmental Review Application.
+                                    </label>
+                                </div>
+                                <div id="err_terms" class="error"></div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label for="crc59_initials" class="form-label required-field">Initials</label>
+                                <input type="text" class="form-control" id="crc59_initials" maxlength="4" required>
+                                <div id="err_initials" class="error"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Step 7: Review & Confirm -->
+                <div class="form-step form-section" data-step="6">
+                    <h2 class="section-header"><i class="fas fa-info-circle"></i> Review & Confirm</h2>
+                    <div class="section-content">
+                        <div id="review-section" class="card p-4">
+                            <h4 class="mb-3">Applicant Information</h4>
+                            <p><strong>Applicant Name:</strong> <span id="confirm_applicantname"></span></p>
+                            <p><strong>Applicant Email:</strong> <span id="confirm_applicantemail"></span></p>
+                            <p><strong>Applicant Phone:</strong> <span id="confirm_applicantphone"></span></p>
+                            <p><strong>Primary Contact Name:</strong> <span id="confirm_primarycontactname"></span></p>
+                            <p><strong>Primary Contact Email:</strong> <span id="confirm_primarycontactemail"></span>
+                            </p>
+                            <p><strong>Primary Contact Phone:</strong> <span id="confirm_primarycontactphone"></span>
+                            </p>
+                            <p><strong>Organization Structure:</strong> <span id="confirm_organizationstructure"></span>
+                            </p>
+
+                            <hr class="my-4">
+
+                            <h4 class="mb-3">Project Details</h4>
+                            <p><strong>Plant Name:</strong> <span id="confirm_plantname"></span></p>
+                            <p><strong>Location:</strong> <span id="confirm_location"></span></p>
+                            <p><strong>Latitude:</strong> <span id="confirm_latitude"></span></p>
+                            <p><strong>Longitude:</strong> <span id="confirm_longitude"></span></p>
+                            <p><strong>Plant Design:</strong> <span id="confirm_plantdesign"></span></p>
+                            <p><strong>Reactor Model:</strong> <span id="confirm_reactormodel"></span></p>
+                            <p><strong>Operating History:</strong> <span id="confirm_operatinghistory"></span></p>
+
+                            <hr class="my-4">
+
+                            <h4 class="mb-3">Schedule & Scope</h4>
+                            <p><strong>Project Start Date:</strong> <span id="confirm_projectedstartdate"></span></p>
+                            <p><strong>Project End Date:</strong> <span id="confirm_projectedenddate"></span></p>
+                            <p><strong>Modification Description:</strong> <span
+                                    id="confirm_modificationdescription"></span>
+                            </p>
+
+                            <hr class="my-4">
+
+                            <h4 class="mb-3">Assurance & Qualifications</h4>
+                            <p><strong>Financial Assurance:</strong> <span id="confirm_financialassurance"></span></p>
+                            <p><strong>Experience Qualification:</strong> <span
+                                    id="confirm_experiencequalifications"></span>
+                            </p>
+
+                            <hr class="my-4">
+
+                            <h4 class="mb-3">Acknowledgement</h4>
+                            <p>I hereby certify that I have read, understand, and agree to the terms and conditions
+                                relating to Environmental Review Application.</p>
+                            <p><strong>Terms Accepted: </strong> <span id="confirm_termsaccepted"></span></p>
+                            <p><strong>Initials:</strong> <span id="confirm_initials"></span></p>
+
+                            <p class="mt-4">Click submit to finalize.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Form Navigation Buttons -->
+                <div class="section-navigation d-flex justify-content-end gap-2">
+                    <button type="button" class="nav-btn btn-cancel" id="cancelBtn"><i class="fas fa-times "></i>
+                        Cancel</button>
+                    <button type="button" class="nav-btn btn-prev" id="prevBtn">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <button type="button" class="nav-btn btn-next" id="nextBtn">Next <i
+                            class="fas fa-chevron-right"></i>
+                    </button>
+                    <button type="submit" class="btn btn-light border border-success border-3 border-opacity-50"
+                        id="submitBtn" style="display:none;"><i class="fas fa-paper-plane"></i> Submit Application
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        /*Initialize Map*/
+        var southWest = L.latLng(24.396308, -125.000000); // Approximate SW corner of USA
+        var northEast = L.latLng(49.384358, -66.934570); // Approximate NE corner of USA
+        var bounds = L.latLngBounds(southWest, northEast);
+
+        let map = L.map('map', { maxBounds: bounds }).fitBounds(bounds).setView([39.381266, -97.922211], 4); // USA center-ish
+        var myAttrControl = L.control.attribution().addTo(map);
+        myAttrControl.setPrefix('<a href="https://leafletjs.com/">Leaflet</a>');
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        /*---------Setup project end date range----------*/
+        const startDateInput = document.getElementById('crc59_projectedstartdate');
+
+        startDateInput.addEventListener('change', function () {
+            const startDate = this.value;
+            const endDateInput = document.getElementById('crc59_projectedenddate');
+            if (startDate) {
+                endDateInput.min = startDate;
+                if (endDateInput.value && endDateInput.value < startDate) {
+                    endDateInput.value = startDate; // Reset end date if it's before start date
+                }
+            } else {
+                endDateInput.min = '';
+            }
+        });
+
+        /* ---------- Helpers ---------- */
+        const $ = sel => document.querySelector(sel);
+        const $$ = sel => Array.from(document.querySelectorAll(sel));
+        const setErr = (id, msg) => { const el = document.getElementById(id); if (el) el.textContent = msg || ""; };
+
+        /* ---------- Step controls ---------- */
+        const form = $('#multiStepForm');
+        const formSteps = $$('.form-step');
+        const navTabs = $$('.form-nav-tabs .nav-link');
+        const prevBtn = $('#prevBtn'), nextBtn = $('#nextBtn'), submitBtn = $('#submitBtn'), cancelBtn = $('#cancelBtn');
+        let currentStep = 0;
+        let completedSteps = new Set();
+
+        function showStep(stepIndex) {
+            formSteps.forEach(s => s.classList.remove('active'));
+            navTabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+
+            formSteps[stepIndex].classList.add('active');
+            navTabs[stepIndex].classList.add('active');
+            navTabs[stepIndex].setAttribute('aria-selected', 'true');
+
+            prevBtn.style.display = (stepIndex === 0) ? 'none' : 'inline-block';
+            nextBtn.style.display = (stepIndex === formSteps.length - 1) ? 'none' : 'inline-block';
+            submitBtn.style.display = (stepIndex === formSteps.length - 1) ? 'inline-block' : 'none';
+
+            navTabs.forEach((tab, idx) => {
+                if (!completedSteps.has(idx) && idx > currentStep) tab.classList.add('disabled');
+                else tab.classList.remove('disabled');
+            });
+
+            // Keep map sized correctly on step 2
+            if (stepIndex === 1 && map) {
+                setTimeout(() => map.invalidateSize(), 0);
+            }
+
+            // Populate review on last step
+            if (stepIndex === formSteps.length - 1) {
+                populateReview();
+            }
+        }
+
+        navTabs.forEach(tab => {
+            tab.addEventListener('click', e => {
+                const idx = parseInt(tab.dataset.step);
+                if (completedSteps.has(idx) || idx < currentStep) {
+                    currentStep = idx; showStep(currentStep);
+                } else {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 0) { currentStep--; showStep(currentStep); }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (validateStep(currentStep)) {
+                completedSteps.add(currentStep);
+                currentStep++;
+                showStep(currentStep);
+            }
+        });
+
+        function handleCancel() {
+            if (confirm('Are you sure you want to cancel? All entered data will be lost.')) {
+                form.reset();
+                window.location.reload();
+            }
+        }
+        cancelBtn.addEventListener('click', handleCancel);
+        // document.getElementById('cancelIconBtn').addEventListener('click', handleCancel);
+
+
+        /* ---------- Validation ---------- */
+        function validateStep(stepIndex) {
+            let valid = true;
+
+            // Basic required & pattern checks
+            const step = formSteps[stepIndex];
+            const requiredInputs = step.querySelectorAll('input[required], select[required], textarea[required]');
+            requiredInputs.forEach(input => {
+                const baseId = input.id.replace('crc59_', '');
+                const errId = `err_${baseId}`;
+                let msg = "";
+
+                if (input.type === 'radio') {
+                    // Acknowledgement radios
+                    const group = form.querySelectorAll('input[name="crc59_termsaccepted"]');
+                    const checked = Array.from(group).some(r => r.checked);
+                    if (!checked) { valid = false; msg = "Please select an option."; }
+                    setErr('err_terms', msg);
+                    return;
+                }
+
+                const value = (input.value || "").trim();
+
+                if (!value) {
+                    valid = false; msg = "This field is required.";
+                } else if (input.type === 'email' && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
+                    valid = false; msg = "Enter a valid email address.";
+                } else if (input.type === 'tel' && !/^[0-9()+\-.\s]{7,20}$/.test(value)) {
+                    valid = false; msg = "Enter a valid phone number.";
+                }
+
+                setErr(errId, msg);
+            });
+
+            // Additional rules on Schedule (step 2)
+            if (stepIndex === 2) {
+                const start = $('#crc59_projectedstartdate').value;
+                const end = $('#crc59_projectedenddate').value;
+                if (start && end && new Date(end) < new Date(start)) {
+                    valid = false;
+                    setErr('err_enddate', 'End date must be the same or after Start date.');
+                } else {
+                    setErr('err_enddate', '');
+                }
+            }
+
+            // On Project step: require lat/long when location provided
+            if (stepIndex === 1) {
+                const loc = $('#crc59_location').value.trim();
+                const lat = $('#crc59_latitude').value.trim();
+                const lon = $('#crc59_longitude').value.trim();
+                if (loc && (!lat || !lon)) {
+                    valid = false;
+                    setErr('err_location', 'Select a suggestion or click on the map to set coordinates.');
+                } else {
+                    setErr('err_location', '');
+                }
+            }
+
+            return valid;
+        }
+
+        function populateReview() {
+            // Option objects for lookup
+            const plant_design_options = {
+                564980000: "Light-Water Reactor (LWR)",
+                564980001: "Pressurized Water Reactor (PWR)",
+                564980002: "Boiling Water Reactor (BWR)",
+            };
+            const financial_assurance_options = {
+                564980000: "Self-Assurance",
+                564980001: "Third-Party Assurance",
+            };
+
+            const ids = [
+                'crc59_applicantname', 'crc59_applicantemail', 'crc59_applicantphone',
+                'crc59_primarycontactname', 'crc59_primarycontactemail', 'crc59_primarycontactphone',
+                'crc59_organizationstructure', 'crc59_plantname', 'crc59_location', 'crc59_latitude', 'crc59_longitude',
+                'crc59_plantdesign', 'crc59_reactormodel', 'crc59_operatinghistory', 'crc59_projectedstartdate', 'crc59_projectedenddate',
+                'crc59_modificationdescription', 'crc59_financialassurance', 'crc59_experiencequalifications', 'crc59_initials'
+            ];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                const conf = document.getElementById('confirm_' + id.replace('crc59_', ''));
+                if (el && conf) {
+                    // Special handling for dropdowns
+                    if (id === 'crc59_plantdesign') {
+                        conf.textContent = plant_design_options[el.value] || 'N/A';
+                    } else if (id === 'crc59_financialassurance') {
+                        conf.textContent = financial_assurance_options[el.value] || 'N/A';
+                    } else if (id === 'crc59_projectedstartdate' || id === 'crc59_projectedenddate') {
+                        // Format date to MM/DD/YYYY
+                        const val = el.value;
+                        if (val) {
+                            const d = new Date(val);
+                            if (!isNaN(d)) {
+                                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                                const dd = String(d.getDate()).padStart(2, '0');
+                                const yyyy = d.getFullYear();
+                                conf.textContent = `${mm}/${dd}/${yyyy}`;
+                            } else {
+                                conf.textContent = val;
+                            }
+                        } else {
+                            conf.textContent = 'N/A';
+                        }
+                    } else {
+                        conf.textContent = (el.value || '').toString() || 'N/A';
+                    }
+                }
+            });
+            // termsaccepted (radio)
+            const terms = document.querySelector('input[name="crc59_termsaccepted"]:checked');
+            const confTerms = document.getElementById('confirm_termsaccepted');
+            if (confTerms) confTerms.textContent = terms ? terms.value : 'N/A';
+        }
+
+        /* ---------- Map & Location Search ---------- */
+
+        let marker;
+        function setMarker(lat, lon) {
+            if (marker) map.removeLayer(marker);
+            marker = L.marker([lat, lon]).addTo(map);
+            map.setView([lat, lon], 13);
+        }
+
+        // Reverse geocode helper (for map clicks)
+        const FLOW_GEO_URL = "https://prod-137.westus.logic.azure.com:443/workflows/2c0a2c10de1f40ff8af5584929aa70c7/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0jf2MWWx2DppTvJxqePK_d5Y6HZmZkVagfUhQaFpyk0";
+
+        // ----- FLOW HELPERS -----
+        async function reverseGeocode(lat, lon) {
+            try {
+                const resp = await fetch(FLOW_GEO_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ mode: "reverse", lat, lon })
+                });
+                const data = await resp.json();
+                return data.display_name || "Selected Location";
+            } catch (e) {
+                console.warn("Reverse geocode failed", e);
+                return "Selected Location";
+            }
+        }
+
+        async function searchLocations(query) {
+            try {
+                const resp = await fetch(FLOW_GEO_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ mode: "search", query })
+                });
+                return await resp.json();
+            } catch (e) {
+                console.warn("Search failed", e);
+                return [];
+            }
+        }
+
+        // ----- MAP CLICK -----
+        map.on("click", async (e) => {
+            const { lat, lng } = e.latlng;
+            $("#crc59_latitude").value = lat.toFixed(6);
+            $("#crc59_longitude").value = lng.toFixed(6);
+
+            const name = await reverseGeocode(lat, lng);
+            $("#crc59_location").value = name;
+            $("#locationMessage").textContent = `Location set to: ${name}`;
+            setMarker(lat, lng);
+        });
+
+        // ----- SEARCH WITH SUGGESTIONS -----
+        const locInput = $("#crc59_location");
+        const suggBox = $("#locationSuggestions");
+
+        const debounce = (fn, delay = 350) => {
+            let t;
+            return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+        };
+
+        locInput.addEventListener("input", debounce(async () => {
+            const q = locInput.value.trim();
+            if (q.length < 3) { suggBox.classList.add("d-none"); suggBox.innerHTML = ""; return; }
+
+            const places = await searchLocations(q);
+            if (!places?.length) { suggBox.classList.add("d-none"); suggBox.innerHTML = ""; return; }
+
+            suggBox.innerHTML = places.map(p =>
+                `<div data-lat="${p.lat}" data-lon="${p.lon}" data-display="${p.display_name}">
+            ${p.display_name}
+        </div>`
+            ).join("");
+            suggBox.classList.remove("d-none");
+        }, 400));
+
+        suggBox.addEventListener("click", e => {
+            const item = e.target.closest("div[data-lat]");
+            if (!item) return;
+            const lat = parseFloat(item.dataset.lat), lon = parseFloat(item.dataset.lon);
+
+            $("#crc59_location").value = item.dataset.display;
+            $("#crc59_latitude").value = lat.toFixed(6);
+            $("#crc59_longitude").value = lon.toFixed(6);
+            setMarker(lat, lon);
+
+            suggBox.classList.add("d-none");
+            suggBox.innerHTML = "";
+            setErr("err_location", "");
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!suggBox.contains(e.target) && e.target !== locInput) {
+                suggBox.classList.add("d-none"); suggBox.innerHTML = "";
+            }
+        });
+
+        /* ---------- Submit to Dataverse ---------- */
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            if (!validateStep(currentStep)) return;
+
+            // Show loading overlay
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            const terms_accepted = document.querySelector('input[name="crc59_termsaccepted"]:checked');
+            const reactor_model = document.getElementById('crc59_reactormodel').value.trim();
+            const plant_design = parseInt($('#crc59_plantdesign').value);
+            const financial_assurance = parseInt($('#crc59_financialassurance').value);
+
+            // Collect all values from the form
+            const record = {
+                crc59_applicantname: $('#crc59_applicantname').value.trim(),
+                crc59_applicantemail: $('#crc59_applicantemail').value.trim(),
+                crc59_applicantphone: $('#crc59_applicantphone').value.trim(),
+                crc59_primarycontactname: $('#crc59_primarycontactname').value.trim(),
+                crc59_primarycontactemail: $('#crc59_primarycontactemail').value.trim(),
+                crc59_primarycontactphone: $('#crc59_primarycontactphone').value.trim(),
+                crc59_organizationstructure: $('#crc59_organizationstructure').value.trim(),
+                crc59_plantname: $('#crc59_plantname').value.trim(),
+                crc59_location: $('#crc59_location').value.trim(),
+                crc59_latitude: $('#crc59_latitude').value.trim(),
+                crc59_longitude: $('#crc59_longitude').value.trim(),
+                crc59_plantdesign: plant_design || null,
+                crc59_reactormodel: reactor_model,
+                crc59_operatinghistory: $('#crc59_operatinghistory').value.trim(),
+                crc59_projectedstartdate: $('#crc59_projectedstartdate').value || null,
+                crc59_projectedenddate: $('#crc59_projectedenddate').value || null,
+                crc59_modificationdescription: $('#crc59_modificationdescription').value.trim(),
+                crc59_financialassurance: financial_assurance || null,
+                crc59_experiencequalifications: $('#crc59_experiencequalifications').value.trim(),
+                crc59_termsaccepted: terms_accepted ? (terms_accepted.value === 'Yes') : false,
+                crc59_initials: $('#crc59_initials').value.trim(),
+                crc59_fileupload_name: $('#crc59_fileupload').files[0] ? encodeURIComponent($('#crc59_fileupload').files[0].name) : null
+            };
+
+            // Disable submit to prevent double posts
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            // Step 1: Create main record
+            webapi.safeAjax({
+                type: "POST",
+                url: "/_api/crc59_nrc_permits_tables", // entity set
+                contentType: "application/json",
+                data: JSON.stringify(record),
+                success: function (data, textStatus, xhr) {
+                    const newId = xhr.getResponseHeader("entityid");
+                    getFileContentsAndMetadata(newId);
+                },
+                error: function (xhr) {
+                    console.error("Create error", xhr);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit';
+                    // Hide loading overlay
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    alert("There was an error creating the record. Please try again.");
+                }
+            });
+
+            function getFileContentsAndMetadata(entityID) {
+                // Get the name of the selected file
+                var fileName = encodeURIComponent(document.getElementById('crc59_fileupload').files[0].name);
+                // Get the content of the selected file
+                var file = document.getElementById('crc59_fileupload').files[0];
+                // If the user has selected a file
+                if (file) {
+                    // Read the file as a byte array
+                    var reader = new FileReader();
+                    reader.readAsArrayBuffer(file);
+                    // The browser has finished reading the file, we can now do something with it...
+                    reader.onload = function (e) {
+                        // The browser has finished reading the file, we can now do something with it...
+                        var fileContent = new Uint8Array(e.target.result);
+
+                        // Run the function to upload to the Portal Web API, passing the GUID of the newly created record and the file's contents and name as inputs
+                        uploadFile(fileContent, fileName, entityID);
+                    };
+                }
+            }
+
+            function uploadFile(fileContent, fileName, newID) {
+
+                // Use the safeAjax function to call the Portal Web API to upload the file as a note attachment
+                webapi.safeAjax({
+                    type: "PATCH",
+                    url: "/_api/crc59_nrc_permits_tables(" + newID + ")/crc59_fileupload?x-ms-file-name=" + fileName,
+                    contentType: "application/octet-stream",
+                    data: fileContent,
+                    processData: false,
+                    success: function (data, textStatus, xhr) {
+                        done(true, "Record and file created successfully!");
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        // If error occurs uploading the file, provide visual feedback
+                        done(false, "Record created but there was an error uploading the file.");
+                        console.error('Error uploading file:', errorThrown);
+                    }
+                });
+            }
+
+            function done(success, message) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Application';
+
+                if (success) {
+                    // Hide loading overlay
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    // Show modal instead of alert
+                    var allDoneModal = document.getElementById('allDoneModal');
+                    if (allDoneModal) {
+                        var modal = new bootstrap.Modal(allDoneModal);
+                        modal.show();
+                        document.getElementById('homeBtn').onclick = function () {
+                            window.location.href = '/'; // Change to your home page URL if needed
+                        };
+                    }
+                    // Reset form
+                    form.reset();
+                    currentStep = 0;
+                    completedSteps = new Set();
+                    showStep(0);
+                    // Reset map & marker
+                    if (marker) { map.removeLayer(marker); marker = null; }
+                    map.setView([39.381266, -97.922211], 4);
+                } else {
+                    alert(message || "There was an error completing the request.");
+                }
+            }
+        });
+
+
+        // Initialize first step view
+        showStep(currentStep);
+    });
+</script>

@@ -1,0 +1,248 @@
+:root {
+    --primary-color: #2c5aa0;
+    --secondary-color: #f8f9fa;
+    --accent-color: #28a745;
+    --border-color: #dee2e6;
+}
+
+.form-section {
+    border-left: 4px solid var(--primary-color);
+    background: var(--secondary-color);
+    /* margin: 30px 0; */
+    padding: 0;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+}
+
+.form-header {
+    background: linear-gradient(135deg, var(--primary-color), #1e3a5f);
+    color: white;
+    padding: 30px;
+    text-align: center;
+    border-radius: 12px 12px 0 0;
+}
+
+.form-header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 300;
+}
+
+.form-header p {
+    margin: 10px 0 0 0;
+    opacity: 0.9;
+}
+
+.section-header {
+    background: var(--primary-color);
+    color: white;
+    padding: 15px 25px;
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+.section-navigation {
+    padding: 20px 25px;
+    border-left: 4px solid var(--primary-color);
+    border-radius: 0 0 8px 8px;
+    background: var(--secondary-color);
+}
+
+.required-field::after {
+    content: " *";
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    border: none;
+    padding: 12px 40px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.form-label {
+    font-weight: 600 !important;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+#review-section p {
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.btn-primary:hover {
+    background: #1e3a5f;
+    transform: translateY(-2px);
+}
+
+.nav-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-prev {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-prev:hover {
+    background: #545b62;
+    transform: translateY(-1px);
+}
+
+.btn-cancel {
+    background: #ffff;
+    color: black;
+    border: 1px solid #6c757d;
+}
+
+.btn-cancel:hover {
+    background: #f8f9fa;
+    transform: translateY(-1px);
+}
+
+.btn-next {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-next:hover {
+    background: #1e3a5f;
+    transform: translateY(-1px);
+}
+
+.btn-prev:disabled,
+.btn-next:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.nav-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Custom Multi-Step Form CSS */
+/* Steps */
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+}
+
+.error {
+    color: #dc3545;
+    font-size: 0.9em;
+    margin-top: .25rem;
+    min-height: 1em;
+}
+
+/* Map */
+#map {
+    height: 400px;
+    border-radius: .375rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+}
+
+/* Tabs */
+.form-nav-tabs .nav-link {
+    cursor: pointer;
+}
+
+.nav-link {
+    color: var(--primary-color) !important
+}
+
+.nav-link.active {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    font-weight: 500;
+}
+
+.form-nav-tabs .nav-link.disabled {
+    color: #6c757d !important;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Suggestion dropdown */
+.positioner {
+    position: relative;
+}
+
+.suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    border: 1px solid #ccc;
+    background: #fff;
+    max-height: 260px;
+    overflow: auto;
+    border-radius: .375rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+}
+
+.suggestions div {
+    padding: .5rem .75rem;
+    cursor: pointer;
+}
+
+.suggestions div:hover {
+    background: #f6f7f9;
+}
+
+.visually-hidden {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+}
+
+/*Confirmation and loading screen styles*/
+#loadingOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+#allDoneModal .modal-content {
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+#allDoneModal .modal-title {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+#allDoneModal .btn-primary {
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 2rem;
+}
+.leaflet-control-attribution {
+    display: none;
+  }

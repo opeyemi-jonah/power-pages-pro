@@ -111,7 +111,7 @@
                         </div>
                         <div class="col-12 col-md-4">
                             <label for="new_applicantemail" class="form-label">Applicant Email:</label>
-                            <input type="email" class="form-control" id="new_applicantemail" required>
+                            <input type="email" name="new_applicantemail" class="form-control" id="new_applicantemail" required>
                             <div id="err_applicantemail" class="error"></div>
                         </div>
                         <div class="col-12 col-md-4">
@@ -126,7 +126,7 @@
                         </div>
                         <div class="col-12 col-md-4">
                             <label for="new_primarycontactemail" class="form-label">Primary Contact Email:</label>
-                            <input type="email" class="form-control" id="new_primarycontactemail" required>
+                            <input type="email" name="new_primarycontactemail" class="form-control" id="new_primarycontactemail" required>
                             <div id="err_primarycontactemail" class="error"></div>
                         </div>
                         <div class="col-12 col-md-4">
@@ -512,7 +512,7 @@
             form.addEventListener('submit', function (event) {
                 event.preventDefault();
                 if (validateStep(currentStep)) {
-                    console.log('Form submitted successfully!');
+                    console.log('Form submitted successfully!', completedSteps);
                     const message = 'Form submitted successfully! Check the console for data.';
                     locationMessage.textContent = message;
                     locationMessage.style.color = '#198754';
