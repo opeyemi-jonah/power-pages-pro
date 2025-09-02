@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NRC Permitting - Environmental Review Applications</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2c5aa0;
+      --secondary-color: #f8f9fa;
+      --accent-color: #28a745;
+      --text-dark: #2c3e50;
+      --text-light: #6c757d;
+      --border-color: #dee2e6;
+      --gradient-start: #2c5aa0;
+      --gradient-end: #1e3a5f;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: var(--text-dark); background-color: #fff; }
+    .header-nav { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+    .navbar-brand { font-weight: 700; font-size: 1.5rem; color: var(--primary-color) !important; }
+    .navbar-nav .nav-link { font-weight: 500; color: var(--text-dark) !important; margin: 0 10px; transition: color 0.3s ease; }
+    .navbar-nav .nav-link:hover { color: var(--primary-color) !important; }
+    .hero-section { background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color: white; padding: 100px 0 80px 0; position: relative; overflow: hidden; }
+    .hero-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>'); opacity: 0.3; }
+    .hero-content { position: relative; z-index: 2; }
+    .hero-title { font-size: 3.5rem; font-weight: 300; margin-bottom: 20px; line-height: 1.2; }
+    .hero-subtitle { font-size: 1.3rem; margin-bottom: 30px; opacity: 0.9; max-width: 600px; }
+    .hero-cta { display: flex; gap: 20px; flex-wrap: wrap; }
+    .btn-primary-custom { background: var(--accent-color); border: none; padding: 15px 35px; font-size: 1.1rem; font-weight: 600; border-radius: 8px; color: white; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3); }
+    .btn-primary-custom:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4); color: white; text-decoration: none; }
+    .btn-secondary-custom { background: transparent; border: 2px solid white; padding: 13px 35px; font-size: 1.1rem; font-weight: 600; border-radius: 8px; color: white; text-decoration: none; transition: all 0.3s ease; }
+    .btn-secondary-custom:hover { background: white; color: var(--primary-color); text-decoration: none; }
+    .section-divider { width: 80%; height: 2px; background: linear-gradient(90deg, transparent, var(--primary-color), transparent); margin: 60px auto; position: relative; }
+    .section-divider::before { content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: var(--primary-color); border-radius: 50%; box-shadow: 0 0 0 4px var(--secondary-color); }
+    .nrc-image-placeholder { background: linear-gradient(135deg, var(--primary-color), var(--gradient-end)); color: white; padding: 60px 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(44, 90, 160, 0.3); max-width: 600px; margin: 0 auto; position: relative; overflow: hidden; }
+    .nrc-image-placeholder::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('Permitting_Banner_optimized.png'); opacity: 0.4; }
+    .nrc-image-content { position: relative; z-index: 2; }
+    .nrc-image-content h4 { font-size: 1.8rem; font-weight: 600; margin-bottom: 10px; }
+    .nrc-image-content p { font-size: 1.1rem; opacity: 0.9; margin: 0; }
+    .quick-links-section { margin: 40px 0; }
+    .quick-link-card { background: white; border-radius: 15px; padding: 30px 20px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: all 0.3s ease; cursor: pointer; border: 2px solid transparent; height: 180px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .quick-link-card:hover { transform: translateY(-8px); box-shadow: 0 15px 40px rgba(44, 90, 160, 0.2); border-color: var(--primary-color); }
+    .quick-link-icon { width: 70px; height: 70px; background: linear-gradient(135deg, var(--primary-color), var(--gradient-end)); border-radius: 15px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; color: white; font-size: 1.8rem; }
+    .quick-link-card h6 { font-size: 1rem; font-weight: 600; color: var(--primary-color); margin: 0; line-height: 1.3; }
+    .section-title { text-align: center; margin-bottom: 60px; }
+    .section-title h2 { font-size: 2.5rem; font-weight: 300; color: var(--primary-color); margin-bottom: 15px; }
+    .section-title p { font-size: 1.1rem; color: var(--text-light); max-width: 600px; margin: 0 auto; }
+    .feature-card { background: white; border-radius: 12px; padding: 40px 30px; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: all 0.3s ease; height: 100%; border: 1px solid var(--border-color); }
+    .feature-card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px rgba(0,0,0,0.15); }
+    .feature-icon { width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-color), var(--gradient-end)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px auto; color: white; font-size: 2rem; }
+    .feature-card h4 { font-size: 1.4rem; font-weight: 600; color: var(--primary-color); margin-bottom: 15px; }
+    .feature-card p { color: var(--text-light); line-height: 1.8; }
+    .process-section { padding: 80px 0; background: white; }
+    .process-step { display: flex; align-items: center; margin-bottom: 40px; padding: 30px; background: var(--secondary-color); border-radius: 12px; border-left: 5px solid var(--primary-color); }
+    .process-number { width: 60px; height: 60px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin-right: 25px; flex-shrink: 0; }
+    .process-content h5 { font-size: 1.3rem; font-weight: 600; color: var(--primary-color); margin-bottom: 10px; }
+    .process-content p { color: var(--text-light); margin: 0; }
+    .stats-section { padding: 60px 0; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color: white; }
+    .stat-item { text-align: center; margin-bottom: 30px; }
+    .stat-number { font-size: 3rem; font-weight: bold; display: block; margin-bottom: 10px; }
+    .stat-label { font-size: 1.1rem; opacity: 0.9; }
+    .cta-section { padding: 80px 0; background: var(--secondary-color); text-align: center; }
+    .cta-title { font-size: 2.2rem; font-weight: 600; color: var(--primary-color); margin-bottom: 20px; }
+    .cta-subtitle { font-size: 1.1rem; color: var(--text-light); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+    .footer { background: var(--text-dark); color: white; padding: 50px 0 30px 0; }
+    .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 30px; }
+    .footer-section h5 { font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; color: white; }
+    .footer-section p, .footer-section a { color: #bbb; text-decoration: none; margin-bottom: 10px; display: block; }
+    .footer-section a:hover { color: white; }
+    .footer-bottom { border-top: 1px solid #444; padding-top: 20px; text-align: center; color: #bbb; }
+    @media (max-width: 768px) {
+      .hero-title { font-size: 2.5rem; }
+      .hero-subtitle { font-size: 1.1rem; }
+      .hero-cta { flex-direction: column; align-items: center; }
+      .btn-primary-custom, .btn-secondary-custom { width: 100%; max-width: 300px; text-align: center; }
+      .process-step { flex-direction: column; text-align: center; }
+      .process-number { margin-right: 0; margin-bottom: 20px; }
+      .section-title h2 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Navigation -->
+  <nav class="navbar navbar-expand-lg header-nav">
+    <div class="container">
+      <a class="navbar-brand" href="#home">
+        <i class="fas fa-atom"></i> NRC Permitting
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        <span class="visually-hidden">Toggle navigation</span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="#process">Process</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="/my-permits">My Applications</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Features Section -->
+  <section id="services" class="features-section">
+    <div class="container">
+      <!-- NRC Permitting Image -->
+      <div class="text-center mb-5">
+        <div class="nrc-image-placeholder">
+          <div class="nrc-image-content">
+            <i class="fas fa-atom fa-4x mb-3"></i>
+            <h4>NRC Nuclear Facility Permitting</h4>
+            <p>Comprehensive Environmental Review Process</p>
+          </div>
+        </div>
+      </div>
+      <!-- Quick Links Section -->
+      <div class="quick-links-section mb-5">
+        <h3 class="text-center mb-4" style="color: var(--primary-color); font-weight: 600;">Quick Links</h3>
+        <div class="row justify-content-center">
+          <div class="col-lg-4 col-md-4 col-sm-6 mb-3">
+            <div class="quick-link-card">
+              <div class="quick-link-icon"><i class="fas fa-chart-bar"></i></div>
+              <h6>NRC By Numbers Summer 2025</h6>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-4 col-sm-6 mb-3">
+            <div class="quick-link-card">
+              <div class="quick-link-icon"><i class="fas fa-project-diagram"></i></div>
+              <h6>NRC New Reactor Licensing Process Diagram</h6>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-4 col-sm-6 mb-3">
+            <div class="quick-link-card" onclick="window.location.href='/environmental-application'">
+              <div class="quick-link-icon"><i class="fas fa-file-plus"></i></div>
+              <h6>Start New Application</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Horizontal Divider -->
+      <div class="section-divider"></div>
+    </div>
+  </section>
+  <!-- Process Section -->
+  <section id="process" class="process-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>NRC New Reactor Licensing Process</h2>
+        <p>Understanding the comprehensive review process for new nuclear reactor licensing</p>
+      </div>
+      <div class="row">
+        <div class="col-lg-10 mx-auto">
+          <div class="process-step">
+            <div class="process-number">1</div>
+            <div class="process-content">
+              <h5>Environmental Review</h5>
+              <p>Required by the National Environmental Policy Act, Endangered Species Act, and the National Historic Preservation Act. This comprehensive review assesses the environmental impact of the proposed nuclear facility.</p>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-number">2</div>
+            <div class="process-content">
+              <h5>Safety Review</h5>
+              <p>Required by the Atomic Energy Act of 1954, as Amended. This thorough safety evaluation ensures the proposed reactor design meets all safety requirements and regulatory standards.</p>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-number">3</div>
+            <div class="process-content">
+              <h5>Hearings</h5>
+              <p>Required by the Atomic Energy Act of 1954 as Amended. Public hearings provide an opportunity for stakeholder input and ensure transparency in the licensing decision process.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Footer -->
+  <footer id="contact" class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h5>NRC Permitting</h5>
+          <p>Your trusted partner for nuclear facility environmental review applications. We ensure compliance and streamline the approval process.</p>
+        </div>
+        <div class="footer-section">
+          <h5>Quick Links</h5>
+          <a href="/environmental-application">New Application</a>
+          <a href="/my-permits">My Applications</a>
+          <a href="#process">Application Process</a>
+          <a href="#services">Services</a>
+        </div>
+        <div class="footer-section">
+          <h5>Support</h5>
+          <a href="mailto:support@nrcpermitting.gov">support@nrcpermitting.gov</a>
+          <a href="tel:+1-800-NRC-HELP">1-800-NRC-HELP</a>
+          <p>Business Hours: Mon-Fri 8AM-6PM EST</p>
+        </div>
+        <div class="footer-section">
+          <h5>Resources</h5>
+          <a href="#">Application Guidelines</a>
+          <a href="#">Required Documents</a>
+          <a href="#">FAQ</a>
+          <a href="#">Regulatory Information</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Nuclear Regulatory Commission. All rights reserved. | Privacy Policy | Terms of Service</p>
+      </div>
+    </div>
+  </footer>
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+    // Add scroll effect to navbar
+    window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.header-nav');
+      if (window.scrollY > 50) {
+        navbar.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+      } else {
+        navbar.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+      }
+    });
+    // Animate statistics when in view
+    const animateStats = () => {
+      const stats = document.querySelectorAll('.stat-number');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const target = entry.target;
+            const finalValue = target.textContent;
+            let current = 0;
+            const increment = finalValue.includes('%') ? 1 : 10;
+            const duration = 2000;
+            const stepTime = duration / (parseInt(finalValue) / increment);
+            const counter = setInterval(() => {
+              current += increment;
+              if (finalValue.includes('%')) {
+                target.textContent = Math.min(current, parseInt(finalValue)) + '%';
+                if (current >= parseInt(finalValue)) clearInterval(counter);
+              } else if (finalValue.includes('+')) {
+                target.textContent = Math.min(current, parseInt(finalValue)) + '+';
+                if (current >= parseInt(finalValue)) clearInterval(counter);
+              } else if (finalValue.includes('/')) {
+                target.textContent = finalValue; // Keep as is for "24/7"
+                clearInterval(counter);
+              } else {
+                target.textContent = Math.min(current, parseInt(finalValue));
+                if (current >= parseInt(finalValue)) clearInterval(counter);
+              }
+            }, stepTime);
+            observer.unobserve(target);
+          }
+        });
+      }, { threshold: 0.5 });
+      stats.forEach(stat => observer.observe(stat));
+    };
+    document.addEventListener('DOMContentLoaded', animateStats);
+  </script>
+</body>
+</html>

@@ -74,38 +74,38 @@
                                     <div class="row g-3 ">
                                         <div class="col-12 col-md-4">
                                             <label for="cre6c_applicantname" class="form-label">Applicant Name</label>
-                                            <input type="text" class="form-control" id="cre6c_applicantname" required>
+                                            <input type="text" class="form-control" id="cre6c_applicantname">
                                             <div id="err_applicantname" class="error"></div>
                                         </div>
                                         <div class="col-12 col-md-4">
                                             <label for="cre6c_applicantemail" class="form-label">Applicant Email</label>
-                                            <input type="email" class="form-control" id="cre6c_applicantemail" required>
+                                            <input type="email" class="form-control" id="cre6c_applicantemail">
                                             <div id="err_applicantemail" class="error"></div>
                                         </div>
                                         <div class="col-12 col-md-4">
                                             <label for="cre6c_applicantphone" class="form-label">Applicant Phone</label>
-                                            <input type="tel" class="form-control" id="cre6c_applicantphone" required>
+                                            <input type="tel" class="form-control" id="cre6c_applicantphone">
                                             <div id="err_applicantphone" class="error"></div>
                                         </div>
                                         <div class="col-12 col-md-4">
                                             <label for="cre6c_primarycontactname" class="form-label">Primary Contact
                                                 Name</label>
                                             <input type="text" class="form-control" id="cre6c_primarycontactname"
-                                                required>
+                                            >
                                             <div id="err_primarycontactname" class="error"></div>
                                         </div>
                                         <div class="col-12 col-md-4">
                                             <label for="cre6c_primarycontactemail" class="form-label">Primary Contact
                                                 Email</label>
                                             <input type="email" class="form-control" id="cre6c_primarycontactemail"
-                                                required>
+                                            >
                                             <div id="err_primarycontactemail" class="error"></div>
                                         </div>
                                         <div class="col-12 col-md-4">
                                             <label for="cre6c_primarycontactphone" class="form-label">Primary Contact
                                                 Phone</label>
                                             <input type="tel" class="form-control" id="cre6c_primarycontactphone"
-                                                required>
+                                            >
                                             <div id="err_primarycontactphone" class="error"></div>
                                         </div>
                                         <div class="col-12">
@@ -125,21 +125,21 @@
                                 <div class="row g-3">
                                     <div class="col-12 col-md-4">
                                         <label for="cre6c_plantname" class="form-label">Plant Name</label>
-                                        <input type="text" class="form-control" id="cre6c_plantname" required>
+                                        <input type="text" class="form-control" id="cre6c_plantname">
                                         <div id="err_plantname" class="error"></div>
                                     </div>
 
                                     <div class="col-12 col-md-4 positioner">
                                         <label for="cre6c_location" class="form-label">Location (search)</label>
                                         <input type="text" class="form-control" id="cre6c_location"
-                                            placeholder="Type an address or place" autocomplete="off" required>
+                                            placeholder="Type an address or place" autocomplete="off">
                                         <div id="locationSuggestions" class="suggestions d-none"></div>
                                         <div id="err_location" class="error"></div>
                                     </div>
 
                                     <div class="col-12 col-md-4">
                                         <label for="cre6c_plantdesign" class="form-label">Plant Design</label>
-                                        <select class="form-select" id="cre6c_plantdesign" required>
+                                        <select class="form-select" id="cre6c_plantdesign">
                                             <option value="">Select an option</option>
                                         </select>
                                         <div id="err_plantdesign" class="error"></div>
@@ -180,12 +180,12 @@
                                     <div class="col-12 col-md-4">
                                         <label for="cre6c_projectedstartdate" class="form-label">Project Start
                                             Date</label>
-                                        <input type="date" class="form-control" id="cre6c_projectedstartdate" required>
+                                        <input type="date" class="form-control" id="cre6c_projectedstartdate">
                                         <div id="err_projectedstartdate" class="error"></div>
                                     </div>
                                     <div class="col-12 col-md-4">
                                         <label for="cre6c_projectedenddate" class="form-label">Project End Date</label>
-                                        <input type="date" class="form-control" id="cre6c_projectedenddate" required>
+                                        <input type="date" class="form-control" id="cre6c_projectedenddate">
                                         <div id="err_projectedenddate" class="error"></div>
                                     </div>
                                     <div class="col-12">
@@ -203,7 +203,7 @@
                                     <div class="col-12 col-md-4">
                                         <label for="cre6c_financialassurance" class="form-label">Financial
                                             Assurance</label>
-                                        <select class="form-select" id="cre6c_financialassurance" required>
+                                        <select class="form-select" id="cre6c_financialassurance">
                                             <option value="">Select an option</option>
                                         </select>
                                         <div id="err_financialassurance" class="error"></div>
@@ -335,9 +335,11 @@
 
             let map = L.map('map', { maxBounds: bounds }).fitBounds(bounds).setView([39.381266, -97.922211], 4); // USA center-ish
             var myAttrControl = L.control.attribution().addTo(map);
-            myAttrControl.setPrefix('<a href="https://leafletjs.com/">Leaflet</a>');
+            myAttrControl.setPrefix('');
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19
+                maxZoom: 19,
+                minZoom: 5,
+                
             }).addTo(map);
 
             /* ---------- Helpers ---------- */
@@ -634,6 +636,7 @@
                 suggBox.classList.remove("d-none");
             }, 400));
 
+
             suggBox.addEventListener("click", e => {
                 const item = e.target.closest("div[data-lat]");
                 if (!item) return;
@@ -643,6 +646,8 @@
                 $("#cre6c_latitude").value = lat.toFixed(6);
                 $("#cre6c_longitude").value = lon.toFixed(6);
                 setMarker(lat, lon);
+                //set the $("#locationMessage").textContent = `Location set to: ${item.dataset.display}`;
+                $("#locationMessage").textContent = `Location set to: ${item.dataset.display}`;
 
                 suggBox.classList.add("d-none");
                 suggBox.innerHTML = "";
