@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Navigation Bar</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc;
+        }
+        /* Simple animation for the hamburger menu */
+        .hamburger-menu span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background-color: #4a5568;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .hamburger-menu span:not(:last-child) {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <nav class="bg-white shadow-lg py-4">
+        <div class="container mx-auto px-4 flex items-center justify-between">
+            <!-- Logo and Title -->
+            <div class="flex items-center space-x-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.433 9.456 5 8 5c-3.1 0-5.5 1.5-5.5 5.5v2c0 4 2.4 5.5 5.5 5.5c1.456 0 2.832-.433 4-1.253M12 6.253c1.168-.82 2.544-1.253 4-1.253 3.1 0 5.5 1.5 5.5 5.5v2c0 4-2.4 5.5-5.5 5.5-1.456 0-2.832-.433-4-1.253" />
+                </svg>
+                <span class="text-2xl font-bold text-gray-800">Your App</span>
+            </div>
+
+            <!-- Main Links (Desktop) -->
+            <div id="nav-links" class="hidden lg:flex lg:items-center space-x-6">
+                <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Home</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">About</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Services</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600 transition-colors duration-300">Contact</a>
+            </div>
+
+            <!-- Hamburger Menu (Mobile) -->
+            <button id="hamburger-btn" title="Open navigation menu" class="lg:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                <div class="hamburger-menu">
+                    <span class="bg-gray-600"></span>
+                    <span class="bg-gray-600"></span>
+                    <span class="bg-gray-600"></span>
+                </div>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-200">Home</a>
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-200">About</a>
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-200">Services</a>
+                <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-200">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        hamburgerBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Hide mobile menu on window resize if it's visible on a larger screen
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

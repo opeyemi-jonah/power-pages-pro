@@ -1,5 +1,5 @@
-
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -90,22 +90,19 @@
                                         <div class="col-12 col-md-4">
                                             <label for="cre6c_primarycontactname" class="form-label">Primary Contact
                                                 Name</label>
-                                            <input type="text" class="form-control" id="cre6c_primarycontactname"
-                                            >
+                                            <input type="text" class="form-control" id="cre6c_primarycontactname">
                                             <div id="err_primarycontactname" class="error"></div>
                                         </div>
                                         <div class="col-12 col-md-4">
                                             <label for="cre6c_primarycontactemail" class="form-label">Primary Contact
                                                 Email</label>
-                                            <input type="email" class="form-control" id="cre6c_primarycontactemail"
-                                            >
+                                            <input type="email" class="form-control" id="cre6c_primarycontactemail">
                                             <div id="err_primarycontactemail" class="error"></div>
                                         </div>
                                         <div class="col-12 col-md-4">
                                             <label for="cre6c_primarycontactphone" class="form-label">Primary Contact
                                                 Phone</label>
-                                            <input type="tel" class="form-control" id="cre6c_primarycontactphone"
-                                            >
+                                            <input type="tel" class="form-control" id="cre6c_primarycontactphone">
                                             <div id="err_primarycontactphone" class="error"></div>
                                         </div>
                                         <div class="col-12">
@@ -118,6 +115,12 @@
                                     </div>
                                 </div>
 
+                            </div>
+
+                            <!-- Start of map overlay -->
+                            <div id="mapLoading" class="map-loading d-none">
+                                <div class="spinner"></div>
+                                <p>Fetching location...</p>
                             </div>
 
                             <div class="form-step" data-step="1">
@@ -286,7 +289,8 @@
                                     <h4 class="mb-3">Schedule & Scope</h4>
                                     <p><strong>Project Start Date:</strong> <span
                                             id="confirm_projectedstartdate"></span></p>
-                                    <p><strong>Project End Date:</strong> <span id="confirm_projectedenddate"></span></p>
+                                    <p><strong>Project End Date:</strong> <span id="confirm_projectedenddate"></span>
+                                    </p>
                                     <p><strong>Modification Description:</strong> <span
                                             id="confirm_modificationdescription"></span></p>
 
@@ -339,7 +343,7 @@
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 minZoom: 5,
-                
+
             }).addTo(map);
 
             /* ---------- Helpers ---------- */
@@ -557,7 +561,7 @@
                 const confTerms = document.getElementById('confirm_termsaccepted');
                 if (confTerms) confTerms.textContent = terms ? terms.value : 'N/A';
             }
-            
+
             /* ---------- Map & Location Search ---------- */
 
             let marker;
@@ -566,6 +570,15 @@
                 marker = L.marker([lat, lon]).addTo(map);
                 map.setView([lat, lon], 13);
             }
+
+            // Show/hide loading overlay on map
+            function showMapLoading() {
+                document.getElementById("mapLoading").classList.remove("d-none");
+            }
+            function hideMapLoading() {
+                document.getElementById("mapLoading").classList.add("d-none");
+            }
+
 
             // Reverse geocode helper (for map clicks)
             const FLOW_GEO_URL = "https://prod-137.westus.logic.azure.com:443/workflows/2c0a2c10de1f40ff8af5584929aa70c7/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0jf2MWWx2DppTvJxqePK_d5Y6HZmZkVagfUhQaFpyk0";
@@ -579,6 +592,7 @@
                         body: JSON.stringify({ mode: "reverse", lat, lon })
                     });
                     const data = await resp.json();
+                    console.log("Reverse geocode data", data);
                     return data.display_name || "Selected Location";
                 } catch (e) {
                     console.warn("Reverse geocode failed", e);
@@ -606,7 +620,10 @@
                 $("#cre6c_latitude").value = lat.toFixed(6);
                 $("#cre6c_longitude").value = lng.toFixed(6);
 
+                showMapLoading();
                 const name = await reverseGeocode(lat, lng);
+                hideMapLoading();
+
                 $("#cre6c_location").value = name;
                 $("#locationMessage").textContent = `Location set to: ${name}`;
                 setMarker(lat, lng);
@@ -623,9 +640,14 @@
 
             locInput.addEventListener("input", debounce(async () => {
                 const q = locInput.value.trim();
-                if (q.length < 3) { suggBox.classList.add("d-none"); suggBox.innerHTML = ""; return; }
+                if (q.length < 9) { suggBox.classList.add("d-none"); suggBox.innerHTML = ""; return; }
+
+                let loadingTimeout = setTimeout(showMapLoading, 300);
 
                 const places = await searchLocations(q);
+                clearTimeout(loadingTimeout);
+                hideMapLoading();
+
                 if (!places?.length) { suggBox.classList.add("d-none"); suggBox.innerHTML = ""; return; }
 
                 suggBox.innerHTML = places.map(p =>
@@ -634,7 +656,7 @@
             </div>`
                 ).join("");
                 suggBox.classList.remove("d-none");
-            }, 400));
+            }, 800));
 
 
             suggBox.addEventListener("click", e => {

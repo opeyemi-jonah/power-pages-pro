@@ -867,9 +867,7 @@
                 const terms_accepted = document.querySelector('input[name="cre6c_termsaccepted"]:checked');
                 const plant_design = parseInt($('#cre6c_plantdesign').value);
                 const financial_assurance = parseInt($('#cre6c_financialassurance').value);
-                var my_file_data;
-                // Get the name of the selected file
-                var fileName = encodeURIComponent(document.getElementById('cre6c_fileupload').files[0].name);
+
                 // Get the content of the selected file
                 var file = document.getElementById('cre6c_fileupload').files[0];
 
@@ -886,6 +884,10 @@
                         console.log('File CONTENT--->', fileContent);
                     };
                 }
+                // Check if a file is uploaded
+                const fileInput = $('#cre6c_fileupload');
+                const fileObj = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+                const fileName = fileObj ? encodeURIComponent(fileObj.name) : null;
 
                 // Collect all values from the form
                 const record = {
@@ -909,9 +911,15 @@
                     cre6c_financialassurance: financial_assurance || null,
                     cre6c_experiencequalification: $('#cre6c_experiencequalification').value.trim(),
                     cre6c_termsaccepted: terms_accepted ? (terms_accepted.value === 'Yes') : false,
-                    cre6c_initials: $('#cre6c_initials').value.trim(),
-                    cre6c_fileupload_name: $('#cre6c_fileupload').files[0] ? encodeURIComponent($('#cre6c_fileupload').files[0].name) : null
+                    cre6c_initials: $('#cre6c_initials').value.trim()
+                    // File name will be conditionally added below
                 };
+
+                // Only add file name if a file is uploaded
+                if (fileName) {
+                    record.cre6c_fileupload_name = fileName;
+                }
+                console.log('RECORD--->',record);
 
                 // Disable submit to prevent double posts
                 submitBtn.disabled = true;
@@ -919,24 +927,24 @@
                 console.log("Submitting record:", record);
 
 
-                // Step 1: Create main record
-                // Get the name of the selected file
-                var fileName = encodeURIComponent(document.getElementById('cre6c_fileupload').files[0].name);
-                // Get the content of the selected file
-                var file = document.getElementById('cre6c_fileupload').files[0];
-                // If the user has selected a file
-                if (file) {
-                    // Read the file as a byte array
-                    var reader = new FileReader();
-                    reader.readAsArrayBuffer(file);
-                    // The browser has finished reading the file, we can now do something with it...
-                    reader.onload = function (e) {
-                        // The browser has finished reading the file, we can now do something with it...
-                        var fileContent = e.target.result;
-                        // Run the function to upload to the Portal Web API, passing the GUID of the newly created record and the file's contents and name as inputs
-                        uploadFile(fileContent, fileName, entityID);
-                    };
-                }
+                // // Step 1: Create main record
+                // // Get the name of the selected file
+                // var fileName = encodeURIComponent(document.getElementById('cre6c_fileupload').files[0].name);
+                // // Get the content of the selected file
+                // var file = document.getElementById('cre6c_fileupload').files[0];
+                // // If the user has selected a file
+                // if (file) {
+                //     // Read the file as a byte array
+                //     var reader = new FileReader();
+                //     reader.readAsArrayBuffer(file);
+                //     // The browser has finished reading the file, we can now do something with it...
+                //     reader.onload = function (e) {
+                //         // The browser has finished reading the file, we can now do something with it...
+                //         var fileContent = e.target.result;
+                //         // Run the function to upload to the Portal Web API, passing the GUID of the newly created record and the file's contents and name as inputs
+                //         uploadFile(fileContent, fileName, entityID);
+                //     };
+                // }
 
                 function done(success, message) {
                     submitBtn.disabled = false;
